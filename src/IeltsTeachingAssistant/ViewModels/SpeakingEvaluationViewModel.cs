@@ -90,6 +90,9 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
     private bool _isErrorVisible = false;
 
     [ObservableProperty]
+    private Microsoft.UI.Xaml.Controls.InfoBarSeverity _infoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+
+    [ObservableProperty]
     private bool _isGrading = false;
 
     [RelayCommand]
@@ -100,6 +103,7 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
         IsErrorVisible = false;
         ErrorMessage = string.Empty;
         IsGrading = true;
+        InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
 
         try
         {
@@ -129,5 +133,41 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
     public void UpdateAverages()
     {
         OnPropertyChanged(nameof(Evaluation));
+    }
+
+    [RelayCommand]
+    private async Task SaveSessionAsync()
+    {
+        if (Evaluation.Student == null)
+        {
+            ErrorMessage = "Please select a student before saving.";
+            IsErrorVisible = true;
+            return;
+        }
+
+        try
+        {
+            Evaluation.ClassId = Evaluation.Student.ClassId;
+            Evaluation.StudentId = Evaluation.Student.Id;
+
+            if (Evaluation.Id == 0)
+            {
+                _context.SpeakingEvaluations.Add(Evaluation);
+            }
+            else
+            {
+                _context.SpeakingEvaluations.Update(Evaluation);
+            }
+            await _context.SaveChangesAsync();
+            
+            ErrorMessage = "Session saved successfully!";
+            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
+            IsErrorVisible = true;
+        }
+        catch (System.Exception ex)
+        {
+            ErrorMessage = $"Failed to save: {ex.Message}";
+            IsErrorVisible = true;
+        }
     }
 }

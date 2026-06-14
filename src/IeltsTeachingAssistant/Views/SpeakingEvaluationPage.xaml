@@ -145,8 +145,9 @@
         </Grid>
         
         <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=OneWay}" 
-                 Severity="Error" Title="Grading Error" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
-                 Margin="0,0,0,16" />
+                 Severity="{x:Bind ViewModel.InfoBarSeverity, Mode=OneWay}" 
+                 Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
+                 Margin="0,0,0,16"/>
         
         <ComboBox Grid.Row="2" Header="Student" ItemsSource="{x:Bind ViewModel.Students, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind ViewModel.Evaluation.Student, Mode=TwoWay}" PlaceholderText="Select student..." HorizontalAlignment="Stretch" Margin="0,0,0,16" />
 
@@ -180,7 +181,7 @@
                             <TextBlock Text="Pronunc.:" Opacity="0.6" VerticalAlignment="Center"/>
                             <TextBlock Text="{x:Bind ViewModel.Evaluation.Pronunciation, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Content="Save Session" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
+                        <Button Content="Save Session" Command="{x:Bind ViewModel.SaveSessionCommand}" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
                     </StackPanel>
                 </Grid>
             </Border>
