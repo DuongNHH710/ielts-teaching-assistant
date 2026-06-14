@@ -64,7 +64,7 @@
                                     <TextBlock Grid.Column="1" Text="{Binding FluencyCoherence}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
                                 <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding FluencyCoherenceAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
-                                <TextBox Header="Teacher Comment" Text="{Binding FluencyCoherenceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding FluencyCoherenceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>
@@ -83,7 +83,7 @@
                                     <TextBlock Grid.Column="1" Text="{Binding LexicalResource}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
                                 <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding LexicalResourceAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
-                                <TextBox Header="Teacher Comment" Text="{Binding LexicalResourceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding LexicalResourceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>
@@ -102,7 +102,7 @@
                                     <TextBlock Grid.Column="1" Text="{Binding GrammaticalRange}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
                                 <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding GrammaticalRangeAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
-                                <TextBox Header="Teacher Comment" Text="{Binding GrammaticalRangeTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding GrammaticalRangeTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>
@@ -121,7 +121,7 @@
                                     <TextBlock Grid.Column="1" Text="{Binding Pronunciation}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
                                 <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding PronunciationAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
-                                <TextBox Header="Teacher Comment" Text="{Binding PronunciationTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding PronunciationTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>

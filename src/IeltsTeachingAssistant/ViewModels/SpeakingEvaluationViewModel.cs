@@ -95,6 +95,9 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
     [ObservableProperty]
     private bool _isGrading = false;
 
+    [ObservableProperty]
+    private bool _hasUnsavedChanges = false;
+
     [RelayCommand]
     private async Task GradeWithAiAsync(SpeakingPart part)
     {
@@ -118,6 +121,7 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
             part.PronunciationAIComment = result.PronunciationAIComment;
 
             UpdateAverages();
+            await SaveSessionAsync();
         }
         catch (System.Exception ex)
         {
@@ -136,7 +140,7 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SaveSessionAsync()
+    public async Task SaveSessionAsync()
     {
         if (Evaluation.Student == null)
         {
@@ -160,6 +164,7 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
             }
             await _context.SaveChangesAsync();
             
+            HasUnsavedChanges = false;
             ErrorMessage = "Session saved successfully!";
             InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
             IsErrorVisible = true;
