@@ -30,10 +30,10 @@ public class WritingEvaluation
         }
     }
     
-    public double TaskAchievement => Tasks.Any() ? Tasks.Average(t => t.TaskAchievement) : 0;
-    public double CoherenceCohesion => Tasks.Any() ? Tasks.Average(t => t.CoherenceCohesion) : 0;
-    public double LexicalResource => Tasks.Any() ? Tasks.Average(t => t.LexicalResource) : 0;
-    public double GrammaticalRange => Tasks.Any() ? Tasks.Average(t => t.GrammaticalRange) : 0;
+    public double TaskAchievement => Tasks.Any(t => t.TaskAchievement > 0) ? Tasks.Where(t => t.TaskAchievement > 0).Average(t => t.TaskAchievement) : 0;
+    public double CoherenceCohesion => Tasks.Any(t => t.CoherenceCohesion > 0) ? Tasks.Where(t => t.CoherenceCohesion > 0).Average(t => t.CoherenceCohesion) : 0;
+    public double LexicalResource => Tasks.Any(t => t.LexicalResource > 0) ? Tasks.Where(t => t.LexicalResource > 0).Average(t => t.LexicalResource) : 0;
+    public double GrammaticalRange => Tasks.Any(t => t.GrammaticalRange > 0) ? Tasks.Where(t => t.GrammaticalRange > 0).Average(t => t.GrammaticalRange) : 0;
     
     public DateTime EvaluatedAt { get; set; } = DateTime.UtcNow;
 
