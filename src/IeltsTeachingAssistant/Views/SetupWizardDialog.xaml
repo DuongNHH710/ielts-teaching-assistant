@@ -1,0 +1,45 @@
+<ContentDialog
+    x:Class="IeltsTeachingAssistant.Views.SetupWizardDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Welcome to IELTS Teaching Assistant"
+    PrimaryButtonText="Save &amp; Continue"
+    DefaultButton="Primary"
+    IsPrimaryButtonEnabled="False"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0">
+        <StackPanel Spacing="16" Width="400">
+            <TextBlock Text="Initial Setup" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Text="Please configure your admin password and Google Cloud settings to start using the application." TextWrapping="Wrap" />
+
+            <!-- Admin Password -->
+            <StackPanel Spacing="8" Margin="0,12,0,0">
+                <TextBlock Text="Admin Password" FontWeight="SemiBold" />
+                <PasswordBox x:Name="PasswordBox" PasswordChanged="Field_Changed" />
+                <TextBlock Text="This password will be required to open the app." FontSize="12" Opacity="0.6" />
+            </StackPanel>
+
+            <!-- Google Cloud Settings -->
+            <StackPanel Spacing="8" Margin="0,12,0,0">
+                <TextBlock Text="Google Cloud Project ID" FontWeight="SemiBold" />
+                <TextBox x:Name="GcpProjectIdBox" TextChanged="Field_Changed" />
+            </StackPanel>
+            
+            <StackPanel Spacing="8">
+                <TextBlock Text="Google Cloud Region" FontWeight="SemiBold" />
+                <TextBox x:Name="GcpRegionBox" Text="us-central1" TextChanged="Field_Changed" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Vertex AI Credentials Path" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox x:Name="GcpCredentialsPathBox" Grid.Column="0" IsReadOnly="True" Margin="0,0,8,0" TextChanged="Field_Changed" />
+                    <Button x:Name="BrowseCredentialsButton" Grid.Column="1" Content="Browse..." Click="BrowseCredentialsButton_Click" />
+                </Grid>
+            </StackPanel>
+
+            <TextBlock x:Name="ErrorText" Foreground="{ThemeResource SystemFillColorCriticalBrush}" Visibility="Collapsed" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

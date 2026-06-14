@@ -1,0 +1,43 @@
+<ContentDialog
+    x:Class="IeltsTeachingAssistant.Views.AddClassDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Add New Class"
+    PrimaryButtonText="Add"
+    SecondaryButtonText="Cancel"
+    DefaultButton="Primary"
+    IsPrimaryButtonEnabled="False"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <StackPanel Spacing="16" Width="300" Margin="0,16,0,0">
+        <TextBox x:Name="NameBox" Header="Class Name" TextChanged="Field_Changed" />
+        <TextBox x:Name="DurationBox" Header="Duration (e.g. 10 weeks or 20 sessions)" TextChanged="Field_Changed" />
+        
+        <TextBlock Text="Schedule" Margin="0,8,0,0" />
+        <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <ToggleButton x:Name="MonToggle" Content="M" Width="36" />
+                <ToggleButton x:Name="TueToggle" Content="T" Width="36" />
+                <ToggleButton x:Name="WedToggle" Content="W" Width="36" />
+                <ToggleButton x:Name="ThuToggle" Content="T" Width="36" />
+                <ToggleButton x:Name="FriToggle" Content="F" Width="36" />
+                <ToggleButton x:Name="SatToggle" Content="S" Width="36" />
+                <ToggleButton x:Name="SunToggle" Content="S" Width="36" />
+            </StackPanel>
+            <TimePicker x:Name="ClassTimePicker" Header="Class Time" MinuteIncrement="15" />
+        </StackPanel>
+
+        <ComboBox x:Name="StatusBox" Header="Status" SelectedIndex="0">
+            <ComboBoxItem Content="Active" />
+            <ComboBoxItem Content="Upcoming" />
+            <ComboBoxItem Content="Completed" />
+        </ComboBox>
+        <CheckBox x:Name="IsOnlineBox" Content="Online Class" Checked="IsOnlineBox_Changed" Unchecked="IsOnlineBox_Changed" />
+        
+        <StackPanel x:Name="OnlineDetailsPanel" Spacing="16" Visibility="Collapsed">
+            <TextBox x:Name="LinkBox" Header="Meeting Link" />
+            <TextBox x:Name="PasswordBox" Header="Meeting Password" />
+            <TextBox x:Name="HostKeyBox" Header="Host Key" />
+        </StackPanel>
+    </StackPanel>
+</ContentDialog>

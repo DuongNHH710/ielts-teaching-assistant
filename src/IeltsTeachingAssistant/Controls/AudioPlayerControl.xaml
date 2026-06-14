@@ -1,0 +1,50 @@
+<UserControl
+    x:Class="IeltsTeachingAssistant.Controls.AudioPlayerControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IeltsTeachingAssistant.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+          BorderThickness="1"
+          CornerRadius="8"
+          Padding="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Button x:Name="PlayPauseButton" 
+                Grid.Column="0" 
+                Style="{StaticResource AccentButtonStyle}"
+                Width="40" Height="40" CornerRadius="20"
+                Click="PlayPauseButton_Click">
+            <FontIcon x:Name="PlayPauseIcon" Glyph="&#xE768;" FontSize="16" />
+        </Button>
+        
+        <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
+            <Slider x:Name="ProgressSlider" 
+                    Minimum="0" Maximum="100" 
+                    ValueChanged="ProgressSlider_ValueChanged" />
+            <Grid Margin="0,-8,0,0">
+                <TextBlock x:Name="CurrentTimeText" Text="00:00" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Left" />
+                <TextBlock x:Name="TotalTimeText" Text="00:00" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" />
+            </Grid>
+        </StackPanel>
+        
+        <DropDownButton Grid.Column="2" Content="1.0x" VerticalAlignment="Center" Background="Transparent" BorderThickness="0">
+            <DropDownButton.Flyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="0.5x" Click="Speed_Click" Tag="0.5" />
+                    <MenuFlyoutItem Text="1.0x" Click="Speed_Click" Tag="1.0" />
+                    <MenuFlyoutItem Text="1.5x" Click="Speed_Click" Tag="1.5" />
+                    <MenuFlyoutItem Text="2.0x" Click="Speed_Click" Tag="2.0" />
+                </MenuFlyout>
+            </DropDownButton.Flyout>
+        </DropDownButton>
+    </Grid>
+</UserControl>

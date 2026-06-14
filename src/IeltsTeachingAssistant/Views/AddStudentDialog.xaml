@@ -1,0 +1,22 @@
+<ContentDialog
+    x:Class="IeltsTeachingAssistant.Views.AddStudentDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:IeltsTeachingAssistant.Models"
+    Title="Add New Student"
+    PrimaryButtonText="Add"
+    SecondaryButtonText="Cancel"
+    DefaultButton="Primary"
+    IsPrimaryButtonEnabled="False"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <StackPanel Spacing="16" Width="300" Margin="0,16,0,0">
+        <TextBox x:Name="NameBox" Header="Student Name" TextChanged="Field_Changed" />
+        <TextBox x:Name="PhoneBox" Header="Phone Number" />
+        <TextBox x:Name="TargetBandBox" Header="Target Band Score" PlaceholderText="e.g. 7.0" />
+        
+        <ComboBox x:Name="ClassBox" Header="Assign to Class" DisplayMemberPath="Name" SelectionChanged="ClassBox_SelectionChanged" />
+        
+        <TextBox x:Name="NotesBox" Header="Notes" AcceptsReturn="True" Height="80" />
+    </StackPanel>
+</ContentDialog>

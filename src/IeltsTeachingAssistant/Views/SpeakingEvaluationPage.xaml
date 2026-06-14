@@ -1,0 +1,229 @@
+<Page
+    x:Class="IeltsTeachingAssistant.Views.SpeakingEvaluationPage"
+    x:Name="RootPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:IeltsTeachingAssistant.Models"
+    xmlns:views="using:IeltsTeachingAssistant.Views"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
+
+    <Page.Resources>
+        <DataTemplate x:Key="SpeakingPartTemplate" x:DataType="models:SpeakingPart">
+            <StackPanel Spacing="16">
+                <!-- Controls for audio -->
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Command="{Binding ElementName=RootPage, Path=ViewModel.StartRecordingCommand}" CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE720;" />
+                    </Button>
+                    <Button Grid.Column="1" Command="{Binding ElementName=RootPage, Path=ViewModel.StopRecordingCommand}" CommandParameter="{Binding}">
+                        <FontIcon Glyph="&#xE71A;" />
+                    </Button>
+                    <TextBlock Grid.Column="2" Text="Ready to record" VerticalAlignment="Center" Opacity="0.6"/>
+                </Grid>
+
+                <TextBox Header="Cue Card" Text="{Binding CueCard, Mode=TwoWay}" AcceptsReturn="True"
+                         Visibility="{x:Bind views:SpeakingEvaluationPage.Part2Visibility(PartNumber)}" />
+                
+                <TextBox Header="Transcript" Text="{Binding Transcript, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="100" />
+                
+                <Button Content="Auto-Grade with AI" 
+                        Command="{Binding ElementName=RootPage, Path=ViewModel.GradeWithAiCommand}" 
+                        CommandParameter="{Binding}" 
+                        HorizontalAlignment="Right" />
+
+                <!-- Criteria 2x2 Grid -->
+                <Grid ColumnSpacing="16" RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Fluency and Coherence -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardOuterShellStyle}">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Fluency and Coherence" FontWeight="SemiBold" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding FluencyCoherence, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
+                                    <TextBlock Grid.Column="1" Text="{Binding FluencyCoherence}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
+                                </Grid>
+                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding FluencyCoherenceAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding FluencyCoherenceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Lexical Resource -->
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardOuterShellStyle}">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Lexical Resource" FontWeight="SemiBold" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding LexicalResource, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
+                                    <TextBlock Grid.Column="1" Text="{Binding LexicalResource}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
+                                </Grid>
+                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding LexicalResourceAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding LexicalResourceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Grammatical Range -->
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardOuterShellStyle}">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Grammatical Range" FontWeight="SemiBold" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding GrammaticalRange, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
+                                    <TextBlock Grid.Column="1" Text="{Binding GrammaticalRange}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
+                                </Grid>
+                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding GrammaticalRangeAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding GrammaticalRangeTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Pronunciation -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardOuterShellStyle}">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Pronunciation" FontWeight="SemiBold" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding Pronunciation, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Pronunciation}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
+                                </Grid>
+                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding PronunciationAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="Teacher Comment" Text="{Binding PronunciationTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="{StaticResource PagePadding}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Speaking Evaluation" Style="{StaticResource PageTitleStyle}" />
+            <ToggleSwitch Header="Focus Mode" IsOn="{x:Bind ViewModel.IsFocusMode, Mode=TwoWay}" HorizontalAlignment="Right" />
+        </Grid>
+        
+        <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=OneWay}" 
+                 Severity="Error" Title="Grading Error" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
+                 Margin="0,0,0,16" />
+        
+        <ComboBox Grid.Row="2" Header="Student" ItemsSource="{x:Bind ViewModel.Students, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind ViewModel.Evaluation.Student, Mode=TwoWay}" PlaceholderText="Select student..." HorizontalAlignment="Stretch" Margin="0,0,0,16" />
+
+        <!-- Horizontal Session Summary -->
+        <Border Grid.Row="3" Margin="0,0,0,24" Style="{StaticResource CardOuterShellStyle}">
+            <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <TextBlock Text="Overall Band:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Bind ViewModel.Evaluation.OverallBand, Mode=OneWay}" Style="{StaticResource BandScoreDisplayStyle}" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="24" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Fluency:" Opacity="0.6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Evaluation.FluencyCoherence, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Lexical:" Opacity="0.6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Evaluation.LexicalResource, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Grammar:" Opacity="0.6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Evaluation.GrammaticalRange, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Pronunc.:" Opacity="0.6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.Evaluation.Pronunciation, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Content="Save Session" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <Grid Grid.Row="4">
+            <!-- SIMULTANEOUS MODE -->
+            <ScrollViewer Visibility="{x:Bind ViewModel.SimultaneousModeVisibility, Mode=OneWay}" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Evaluation.Parts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:SpeakingPart">
+                            <Border Style="{StaticResource CardOuterShellStyle}" Margin="0,0,0,24">
+                                <Border Style="{StaticResource PremiumCardStyle}">
+                                    <StackPanel Spacing="16">
+                                        <TextBlock Text="{x:Bind views:SpeakingEvaluationPage.FormatPartTitle(PartNumber)}" Style="{StaticResource OverlineStyle}" />
+                                        <ContentPresenter Content="{x:Bind}" ContentTemplate="{StaticResource SpeakingPartTemplate}" />
+                                    </StackPanel>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- FOCUS MODE -->
+            <Pivot Visibility="{x:Bind ViewModel.FocusModeVisibility, Mode=OneWay}" ItemsSource="{x:Bind ViewModel.Evaluation.Parts}">
+                <Pivot.HeaderTemplate>
+                    <DataTemplate x:DataType="models:SpeakingPart">
+                        <TextBlock Text="{x:Bind views:SpeakingEvaluationPage.FormatPartTitle(PartNumber)}" />
+                    </DataTemplate>
+                </Pivot.HeaderTemplate>
+                <Pivot.ItemTemplate>
+                    <DataTemplate x:DataType="models:SpeakingPart">
+                        <ScrollViewer Margin="0,16,0,0" VerticalScrollBarVisibility="Auto">
+                            <Border Style="{StaticResource CardOuterShellStyle}" Margin="0,0,0,24">
+                                <Border Style="{StaticResource PremiumCardStyle}">
+                                    <ContentPresenter Content="{x:Bind}" ContentTemplate="{StaticResource SpeakingPartTemplate}" />
+                                </Border>
+                            </Border>
+                        </ScrollViewer>
+                    </DataTemplate>
+                </Pivot.ItemTemplate>
+            </Pivot>
+        </Grid>
+    </Grid>
+</Page>

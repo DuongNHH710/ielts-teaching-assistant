@@ -1,0 +1,270 @@
+<Page
+    x:Class="IeltsTeachingAssistant.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="{StaticResource PagePadding}">
+        <StackPanel Spacing="32" MaxWidth="1400">
+
+            <!-- ═══ Page Header ═══ -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="GreetingText"
+                           Style="{StaticResource PageTitleStyle}"
+                           x:Uid="DashboardGreeting" />
+                <TextBlock x:Name="DateText"
+                           FontSize="{StaticResource BodyLargeFontSize}"
+                           Opacity="0.6" />
+            </StackPanel>
+
+            <!-- ═══ Quick Action Cards ═══ -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="QUICK ACTIONS"
+                           Style="{StaticResource OverlineStyle}" />
+
+                <Grid ColumnSpacing="{StaticResource CardSpacing}" RowSpacing="{StaticResource CardSpacing}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- New Speaking Evaluation -->
+                    <Button Grid.Column="0" Style="{StaticResource QuickActionButtonStyle}"
+                            Click="NewSpeakingEval_Click">
+                        <StackPanel Spacing="12" Padding="4">
+                            <Border Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="{StaticResource MediumCornerRadius}"
+                                    Width="44" Height="44"
+                                    HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE720;" FontSize="20"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Speaking Test"
+                                           FontSize="15" FontWeight="SemiBold" />
+                                <TextBlock Text="New evaluation"
+                                           FontSize="12" Opacity="0.5" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- New Writing Evaluation -->
+                    <Button Grid.Column="1" Style="{StaticResource QuickActionButtonStyle}"
+                            Click="NewWritingEval_Click">
+                        <StackPanel Spacing="12" Padding="4">
+                            <Border Background="#10B981"
+                                    CornerRadius="{StaticResource MediumCornerRadius}"
+                                    Width="44" Height="44"
+                                    HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE70F;" FontSize="20"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Writing Test"
+                                           FontSize="15" FontWeight="SemiBold" />
+                                <TextBlock Text="New evaluation"
+                                           FontSize="12" Opacity="0.5" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Add Class -->
+                    <Button Grid.Column="2" Style="{StaticResource QuickActionButtonStyle}"
+                            Click="AddClass_Click">
+                        <StackPanel Spacing="12" Padding="4">
+                            <Border Background="#F59E0B"
+                                    CornerRadius="{StaticResource MediumCornerRadius}"
+                                    Width="44" Height="44"
+                                    HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE902;" FontSize="20"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Add Class"
+                                           FontSize="15" FontWeight="SemiBold" />
+                                <TextBlock Text="Create new class"
+                                           FontSize="12" Opacity="0.5" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Add Student -->
+                    <Button Grid.Column="3" Style="{StaticResource QuickActionButtonStyle}"
+                            Click="AddStudent_Click">
+                        <StackPanel Spacing="12" Padding="4">
+                            <Border Background="#3B82F6"
+                                    CornerRadius="{StaticResource MediumCornerRadius}"
+                                    Width="44" Height="44"
+                                    HorizontalAlignment="Left">
+                                <FontIcon Glyph="&#xE716;" FontSize="20"
+                                          Foreground="White"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Add Student"
+                                           FontSize="15" FontWeight="SemiBold" />
+                                <TextBlock Text="Register student"
+                                           FontSize="12" Opacity="0.5" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- ═══ Stats Overview ═══ -->
+            <Grid ColumnSpacing="{StaticResource CardSpacing}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Total Students -->
+                <Border Grid.Column="0" Style="{StaticResource PremiumCardStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="STUDENTS" Style="{StaticResource OverlineStyle}" />
+                        <TextBlock x:Name="TotalStudentsText"
+                                   Text="0"
+                                   Style="{StaticResource BandScoreDisplayStyle}" />
+                        <TextBlock Text="Total enrolled"
+                                   FontSize="12" Opacity="0.5" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Active Classes -->
+                <Border Grid.Column="1" Style="{StaticResource PremiumCardStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="CLASSES" Style="{StaticResource OverlineStyle}" />
+                        <TextBlock x:Name="ActiveClassesText"
+                                   Text="0"
+                                   Style="{StaticResource BandScoreDisplayStyle}" />
+                        <TextBlock Text="Active classes"
+                                   FontSize="12" Opacity="0.5" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Evaluations This Month -->
+                <Border Grid.Column="2" Style="{StaticResource PremiumCardStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="EVALUATIONS" Style="{StaticResource OverlineStyle}" />
+                        <TextBlock x:Name="MonthlyEvalsText"
+                                   Text="0"
+                                   Style="{StaticResource BandScoreDisplayStyle}" />
+                        <TextBlock Text="This month"
+                                   FontSize="12" Opacity="0.5" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Average Band -->
+                <Border Grid.Column="3" Style="{StaticResource PremiumCardStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="AVG. BAND" Style="{StaticResource OverlineStyle}" />
+                        <TextBlock x:Name="AvgBandText"
+                                   Text="—"
+                                   Style="{StaticResource BandScoreDisplayStyle}" />
+                        <TextBlock Text="Overall average"
+                                   FontSize="12" Opacity="0.5" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ═══ Recent Activity ═══ -->
+            <StackPanel Spacing="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Recent Activity"
+                               Style="{StaticResource SectionHeaderStyle}" />
+                    <HyperlinkButton Grid.Column="1" Content="View all"
+                                     VerticalAlignment="Bottom" />
+                </Grid>
+
+                <Border Style="{StaticResource PremiumCardStyle}"
+                        Padding="0">
+                    <ListView x:Name="RecentActivityList"
+                              SelectionMode="None"
+                              ItemsSource="{x:Bind ViewModel.RecentEvaluations, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="20,14" ColumnSpacing="16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Type Icon -->
+                                    <Border Grid.Column="0" Width="36" Height="36"
+                                            CornerRadius="{StaticResource SmallCornerRadius}"
+                                            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                            VerticalAlignment="Center">
+                                        <FontIcon Glyph="&#xE720;" FontSize="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <!-- Student + Type -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Text="{Binding StudentName}"
+                                                   FontWeight="Medium" />
+                                        <TextBlock Text="{Binding EvaluationType}"
+                                                   FontSize="12" Opacity="0.5" />
+                                    </StackPanel>
+
+                                    <!-- Band Score -->
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding BandScore}"
+                                               FontSize="18" FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+
+                                    <!-- Date -->
+                                    <TextBlock Grid.Column="3"
+                                               Text="{Binding Date}"
+                                               FontSize="12" Opacity="0.4"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+
+                <!-- Empty State -->
+                <Border x:Name="EmptyStatePanel"
+                        Style="{StaticResource PremiumCardStyle}"
+                        Visibility="Collapsed"
+                        Padding="40"
+                        HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center">
+                        <FontIcon Glyph="&#xE8B7;" FontSize="48" Opacity="0.3" />
+                        <TextBlock Text="No evaluations yet"
+                                   FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Start by creating a class and adding students, then evaluate their Speaking or Writing tests."
+                                   FontSize="13" Opacity="0.5"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   MaxWidth="400" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

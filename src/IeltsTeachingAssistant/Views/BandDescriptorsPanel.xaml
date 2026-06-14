@@ -1,0 +1,26 @@
+<UserControl
+    x:Class="IeltsTeachingAssistant.Views.BandDescriptorsPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Padding="20">
+        <StackPanel Spacing="16">
+            <TextBlock Text="Band Descriptors" Style="{StaticResource SectionHeaderStyle}" />
+            
+            <ComboBox x:Name="CriterionSelector" Header="Criterion" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="OnCriterionChanged">
+                <ComboBoxItem Content="Fluency and Coherence" />
+                <ComboBoxItem Content="Lexical Resource" />
+                <ComboBoxItem Content="Grammatical Range" />
+                <ComboBoxItem Content="Pronunciation" />
+            </ComboBox>
+
+            <NumberBox x:Name="BandSelector" Header="Band Score (4.0 - 9.0)" Minimum="4.0" Maximum="9.0" SmallChange="0.5" LargeChange="1.0" Value="6.0" ValueChanged="OnBandChanged" />
+
+            <TextBlock Text="Descriptor:" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <TextBlock x:Name="DescriptorText" TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</UserControl>

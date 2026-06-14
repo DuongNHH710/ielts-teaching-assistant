@@ -1,0 +1,118 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using IeltsTeachingAssistant.Models;
+using IeltsTeachingAssistant.Services;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using IeltsTeachingAssistant.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace IeltsTeachingAssistant.ViewModels;
+
+public partial class WritingEvaluationViewModel : ObservableObject
+{
+    private readonly IVertexAIService _vertexAiService;
+    private readonly IEvaluationService _evaluationService;
+
+    [ObservableProperty]
+    private WritingEvaluation _evaluation;
+
+    [ObservableProperty]
+    private System.Collections.ObjectModel.ObservableCollection<Student> _students = new();
+
+    private readonly AppDbContext _context;
+
+    private bool _isFocusMode = false;
+    public bool IsFocusMode
+    {
+        get => _isFocusMode;
+        set
+        {
+            if (SetProperty(ref _isFocusMode, value))
+            {
+                OnPropertyChanged(nameof(SimultaneousModeVisibility));
+                OnPropertyChanged(nameof(FocusModeVisibility));
+            }
+        }
+    }
+
+    public Microsoft.UI.Xaml.Visibility SimultaneousModeVisibility => _isFocusMode ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
+    public Microsoft.UI.Xaml.Visibility FocusModeVisibility => _isFocusMode ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+    public WritingEvaluationViewModel(
+        IVertexAIService vertexAiService,
+        IEvaluationService evaluationService,
+        Data.AppDbContext context)
+    {
+        _vertexAiService = vertexAiService;
+        _evaluationService = evaluationService;
+        _context = context;
+
+        _evaluation = new WritingEvaluation();
+        _evaluation.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = _evaluation });
+        _evaluation.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = _evaluation });
+        
+        // Students are loaded via InitializeAsync()
+    }
+    
+    public async Task InitializeAsync()
+    {
+        Students.Clear();
+        var students = await _context.Students.ToListAsync();
+        foreach (var s in students)
+        {
+            Students.Add(s);
+        }
+    }
+
+    [ObservableProperty]
+    private string _errorMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _isErrorVisible = false;
+
+    [ObservableProperty]
+    private bool _isGrading = false;
+
+    [RelayCommand]
+    private async Task GradeWithAiAsync(WritingTask task)
+    {
+        if (task == null) return;
+        
+        IsErrorVisible = false;
+        ErrorMessage = string.Empty;
+        IsGrading = true;
+
+        try
+        {
+            var taskTypeStr = task.TaskNumber == 1 ? (task.TaskType ?? "Graph") : "Essay";
+
+            var result = await _vertexAiService.GradeWritingAsync(task.Prompt ?? "", task.SubmissionText ?? "", task.TaskNumber, "Academic", taskTypeStr);
+            task.TaskAchievement = result.TaskAchievement;
+            task.TaskAchievementAIComment = result.TaskAchievementAIComment;
+            task.CoherenceCohesion = result.CoherenceCohesion;
+            task.CoherenceCohesionAIComment = result.CoherenceCohesionAIComment;
+            task.LexicalResource = result.LexicalResource;
+            task.LexicalResourceAIComment = result.LexicalResourceAIComment;
+            task.GrammaticalRange = result.GrammaticalRange;
+            task.GrammaticalRangeAIComment = result.GrammaticalRangeAIComment;
+
+            UpdateAverages();
+        }
+        catch (System.Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            IsErrorVisible = true;
+        }
+        finally
+        {
+            IsGrading = false;
+        }
+    }
+
+    public void UpdateAverages()
+    {
+        OnPropertyChanged(nameof(Evaluation));
+    }
+}
