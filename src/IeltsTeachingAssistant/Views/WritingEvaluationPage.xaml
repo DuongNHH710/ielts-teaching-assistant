@@ -98,7 +98,7 @@
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardOuterShellStyle}">
                         <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Grammatical Range" FontWeight="SemiBold" />
+                                <TextBlock Text="Grammatical Range and Accuracy" FontWeight="SemiBold" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />

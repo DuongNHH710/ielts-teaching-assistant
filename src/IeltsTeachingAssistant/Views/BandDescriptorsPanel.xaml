@@ -13,7 +13,7 @@
             <ComboBox x:Name="CriterionSelector" Header="Criterion" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="OnCriterionChanged">
                 <ComboBoxItem Content="Fluency and Coherence" />
                 <ComboBoxItem Content="Lexical Resource" />
-                <ComboBoxItem Content="Grammatical Range" />
+                <ComboBoxItem Content="Grammatical Range and Accuracy" />
                 <ComboBoxItem Content="Pronunciation" />
             </ComboBox>
 
