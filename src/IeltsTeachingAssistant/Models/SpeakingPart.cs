@@ -41,6 +41,8 @@ public partial class SpeakingPart : ObservableObject
     [ObservableProperty]
     private double _pronunciation;
 
+    public double OverallBand => Math.Round((FluencyCoherence + LexicalResource + GrammaticalRange + Pronunciation) / 4.0 * 2) / 2.0;
+
     [ObservableProperty]
     private string? _fluencyCoherenceAIComment;
 

@@ -7,9 +7,9 @@
     mc:Ignorable="d"
     NavigationCacheMode="Enabled">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Padding="{StaticResource PagePadding}">
-            <StackPanel Spacing="32" MaxWidth="1400" HorizontalAlignment="Left">
+    <Grid Padding="{StaticResource PagePadding}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="32">
 
             <!-- ═══ Page Header ═══ -->
             <StackPanel Spacing="4">
@@ -267,6 +267,6 @@
             </StackPanel>
 
             </StackPanel>
-        </Grid>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Page>

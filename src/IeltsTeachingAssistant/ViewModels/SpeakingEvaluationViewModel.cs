@@ -154,11 +154,12 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
             Evaluation.ClassId = Evaluation.Student.ClassId;
             Evaluation.StudentId = Evaluation.Student.Id;
 
-            // Unset navigation properties to prevent EF from incorrectly trying to attach/insert them
-            var tempStudent = Evaluation.Student;
-            var tempClass = Evaluation.Class;
-            Evaluation.Student = null;
-            Evaluation.Class = null;
+            // Mark Student and Class as Unchanged so EF Core doesn't try to insert them as new records
+            _context.Entry(Evaluation.Student).State = EntityState.Unchanged;
+            if (Evaluation.Class != null)
+            {
+                _context.Entry(Evaluation.Class).State = EntityState.Unchanged;
+            }
 
             if (Evaluation.Id == 0)
             {
@@ -166,13 +167,14 @@ public partial class SpeakingEvaluationViewModel : ObservableObject
             }
             else
             {
-                _context.SpeakingEvaluations.Update(Evaluation);
+                var entry = _context.Entry(Evaluation);
+                if (entry.State == EntityState.Detached)
+                {
+                    _context.SpeakingEvaluations.Update(Evaluation);
+                }
             }
+
             await _context.SaveChangesAsync();
-            
-            // Restore navigation properties
-            Evaluation.Student = tempStudent;
-            Evaluation.Class = tempClass;
             
             HasUnsavedChanges = false;
             ErrorMessage = "Session saved successfully!";

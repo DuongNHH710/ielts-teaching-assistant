@@ -159,8 +159,17 @@ public class VertexAIService : IVertexAIService
         {
             try
             {
-                resultJson = resultJson.Replace("```json", "").Replace("```", "").Trim();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                int start = resultJson.IndexOf('{');
+                int end = resultJson.LastIndexOf('}');
+                if (start >= 0 && end >= start)
+                {
+                    resultJson = resultJson.Substring(start, end - start + 1);
+                }
+                var options = new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals
+                };
                 var result = JsonSerializer.Deserialize<SpeakingGradingResult>(resultJson, options);
                 if (result != null) return result;
             }
@@ -197,8 +206,17 @@ public class VertexAIService : IVertexAIService
         {
             try
             {
-                resultJson = resultJson.Replace("```json", "").Replace("```", "").Trim();
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                int start = resultJson.IndexOf('{');
+                int end = resultJson.LastIndexOf('}');
+                if (start >= 0 && end >= start)
+                {
+                    resultJson = resultJson.Substring(start, end - start + 1);
+                }
+                var options = new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals
+                };
                 var result = JsonSerializer.Deserialize<WritingGradingResult>(resultJson, options);
                 if (result != null) return result;
             }

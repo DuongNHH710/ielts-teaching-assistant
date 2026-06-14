@@ -31,5 +31,13 @@ public sealed partial class StudentManagementPage : Page
         }
     }
 
+    private void ViewPerformance_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (ViewModel.SelectedStudent != null)
+        {
+            Frame.Navigate(typeof(StudentPerformancePage), ViewModel.SelectedStudent.Id);
+        }
+    }
+
     public static Visibility DetailVisibility(Student? selectedStudent) => selectedStudent != null ? Visibility.Visible : Visibility.Collapsed;
 }

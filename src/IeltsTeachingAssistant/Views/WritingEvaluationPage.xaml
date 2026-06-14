@@ -148,25 +148,25 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
                         <TextBlock Text="Overall Band:" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.Evaluation.OverallBand, Mode=OneWay}" Style="{StaticResource BandScoreDisplayStyle}" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+                        <TextBlock Text="{x:Bind ViewModel.EvaluationOverallBand, Mode=OneWay}" Style="{StaticResource BandScoreDisplayStyle}" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="24" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Task Ach.:" Opacity="0.6" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Evaluation.TaskAchievement, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.EvaluationTaskAchievement, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Coh/Coh:" Opacity="0.6" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Evaluation.CoherenceCohesion, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.EvaluationCoherenceCohesion, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Lexical:" Opacity="0.6" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Evaluation.LexicalResource, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.EvaluationLexicalResource, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="Grammar:" Opacity="0.6" VerticalAlignment="Center"/>
-                            <TextBlock Text="{x:Bind ViewModel.Evaluation.GrammaticalRange, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{x:Bind ViewModel.EvaluationGrammaticalRange, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Content="Save Session" Command="{x:Bind ViewModel.SaveSessionCommand}" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
                     </StackPanel>

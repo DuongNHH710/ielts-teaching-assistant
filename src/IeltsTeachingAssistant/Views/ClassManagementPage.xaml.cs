@@ -31,5 +31,13 @@ public sealed partial class ClassManagementPage : Page
         }
     }
 
+    private void ViewPerformance_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (ViewModel.SelectedClass != null)
+        {
+            Frame.Navigate(typeof(ClassPerformancePage), ViewModel.SelectedClass.Id);
+        }
+    }
+
     public static Visibility DetailVisibility(ClassEntity? selectedClass) => selectedClass != null ? Visibility.Visible : Visibility.Collapsed;
 }

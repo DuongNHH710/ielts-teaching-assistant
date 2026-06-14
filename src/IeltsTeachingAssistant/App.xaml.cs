@@ -5,6 +5,8 @@ using IeltsTeachingAssistant.Data;
 using IeltsTeachingAssistant.Services;
 using IeltsTeachingAssistant.ViewModels;
 
+using Microsoft.EntityFrameworkCore.Metadata;
+
 namespace IeltsTeachingAssistant;
 
 /// <summary>
@@ -84,6 +86,8 @@ public partial class App : Application
         services.AddTransient<WritingEvaluationViewModel>();
         services.AddTransient<ClassManagementViewModel>();
         services.AddTransient<StudentManagementViewModel>();
+        services.AddTransient<StudentPerformanceViewModel>();
+        services.AddTransient<ClassPerformanceViewModel>();
         services.AddTransient<SettingsViewModel>();
 
         // ─── Logging ───
@@ -100,6 +104,89 @@ public partial class App : Application
         using var scope = Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         context.Database.EnsureCreated();
+
+        try
+        {
+            var connection = context.Database.GetDbConnection();
+            bool openedLocal = false;
+            if (connection.State != System.Data.ConnectionState.Open)
+            {
+                connection.Open();
+                openedLocal = true;
+            }
+
+            foreach (var entityType in context.Model.GetEntityTypes())
+            {
+                var tableName = entityType.GetTableName();
+                if (string.IsNullOrEmpty(tableName)) continue;
+
+                var storeObject = StoreObjectIdentifier.Table(tableName, null);
+
+                // Get existing columns for this table
+                var existingColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = $"PRAGMA table_info(\"{tableName}\");";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var colName = reader["name"]?.ToString();
+                            if (colName != null)
+                            {
+                                existingColumns.Add(colName);
+                            }
+                        }
+                    }
+                }
+
+                // Check and add missing columns
+                foreach (var property in entityType.GetProperties())
+                {
+                    var columnName = property.GetColumnName(storeObject);
+                    if (string.IsNullOrEmpty(columnName)) columnName = property.Name;
+
+                    // Skip primary keys (they must exist if table exists)
+                    if (property.IsPrimaryKey()) continue;
+
+                    if (!existingColumns.Contains(columnName))
+                    {
+                        var storeType = property.GetColumnType(storeObject);
+                        if (string.IsNullOrEmpty(storeType)) storeType = property.GetColumnType();
+
+                        var isNullable = property.IsNullable;
+                        var nullableSql = isNullable ? "NULL" : "NOT NULL";
+                        
+                        // Set defaults to avoid SQL errors when adding a non-nullable column to a populated table
+                        var defaultSql = "";
+                        if (!isNullable)
+                        {
+                            var clrType = property.ClrType;
+                            if (clrType == typeof(string)) defaultSql = " DEFAULT ''";
+                            else if (clrType == typeof(int) || clrType == typeof(long) || clrType == typeof(short) || clrType == typeof(byte)) defaultSql = " DEFAULT 0";
+                            else if (clrType == typeof(double) || clrType == typeof(float) || clrType == typeof(decimal)) defaultSql = " DEFAULT 0.0";
+                            else if (clrType == typeof(bool)) defaultSql = " DEFAULT 0";
+                            else if (clrType == typeof(DateTime)) defaultSql = " DEFAULT '0001-01-01 00:00:00'";
+                        }
+
+                        using (var cmd = connection.CreateCommand())
+                        {
+                            cmd.CommandText = $"ALTER TABLE \"{tableName}\" ADD COLUMN \"{columnName}\" {storeType} {nullableSql}{defaultSql};";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+            }
+
+            if (openedLocal)
+            {
+                connection.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error during automatic migration: {ex}");
+        }
     }
 
     /// <summary>
