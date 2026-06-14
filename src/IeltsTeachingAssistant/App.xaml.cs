@@ -66,7 +66,7 @@ public partial class App : Application
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite($"Data Source={dbPath};Journal Mode=WAL;"));
+            options.UseSqlite($"Data Source={dbPath}"));
 
         // ─── Services ───
         services.AddHttpClient();
