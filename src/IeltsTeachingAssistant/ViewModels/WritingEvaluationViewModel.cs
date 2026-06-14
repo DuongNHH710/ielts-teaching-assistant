@@ -139,6 +139,12 @@ public partial class WritingEvaluationViewModel : ObservableObject
             // Ensure ClassId is set from the selected Student
             Evaluation.ClassId = Evaluation.Student.ClassId;
             Evaluation.StudentId = Evaluation.Student.Id;
+            
+            // Unset navigation properties to prevent EF from incorrectly trying to attach/insert them
+            var tempStudent = Evaluation.Student;
+            var tempClass = Evaluation.Class;
+            Evaluation.Student = null;
+            Evaluation.Class = null;
 
             if (Evaluation.Id == 0)
             {
@@ -150,6 +156,10 @@ public partial class WritingEvaluationViewModel : ObservableObject
             }
             await _context.SaveChangesAsync();
             
+            // Restore navigation properties
+            Evaluation.Student = tempStudent;
+            Evaluation.Class = tempClass;
+            
             HasUnsavedChanges = false;
             ErrorMessage = "Session saved successfully!";
             InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
@@ -157,7 +167,9 @@ public partial class WritingEvaluationViewModel : ObservableObject
         }
         catch (System.Exception ex)
         {
-            ErrorMessage = $"Failed to save: {ex.Message}";
+            var msg = ex.Message;
+            if (ex.InnerException != null) msg += "\nInner: " + ex.InnerException.Message;
+            ErrorMessage = $"Failed to save: {msg}";
             IsErrorVisible = true;
         }
     }

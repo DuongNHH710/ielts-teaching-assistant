@@ -53,8 +53,25 @@ public sealed partial class WritingEvaluationPage : Page
             
             if (result == ContentDialogResult.Primary)
             {
-                await ViewModel.SaveSessionAsync();
-                Frame.Navigate(e.SourcePageType, e.Parameter);
+                try
+                {
+                    await ViewModel.SaveSessionAsync();
+                    if (!ViewModel.HasUnsavedChanges)
+                    {
+                        var frame = Frame;
+                        var targetPage = e.SourcePageType;
+                        var parameter = e.Parameter;
+                        // Force navigation after cleanup
+                        frame.Navigate(targetPage, parameter);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    var msg = ex.Message;
+                    if (ex.InnerException != null) msg += "\nInner: " + ex.InnerException.Message;
+                    ViewModel.ErrorMessage = $"Failed to save: {msg}";
+                    ViewModel.IsErrorVisible = true;
+                }
             }
             else if (result == ContentDialogResult.Secondary)
             {
