@@ -66,7 +66,7 @@ public class VertexAIService : IVertexAIService
         if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId) || string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
         {
             _logger.LogWarning("Vertex AI settings are not fully configured.");
-            return null; // Fallback to mock
+            return null;
         }
 
         var token = await GetAccessTokenAsync(settings.GcpCredentialsPath);
@@ -75,6 +75,9 @@ public class VertexAIService : IVertexAIService
         string projectId = settings.GcpProjectId;
         string region = string.IsNullOrWhiteSpace(settings.GcpRegion) ? "us-central1" : settings.GcpRegion;
         string modelId = string.IsNullOrWhiteSpace(settings.PreferredModel) ? "gemini-2.5-flash-preview-0409" : settings.PreferredModel;
+        
+        // Map old or UI-friendly names to actual Vertex AI endpoints
+        if (modelId.Contains("1.5")) modelId = "gemini-2.5-flash"; // Auto-upgrade old settings
         if (modelId == "Gemini 2.5 Flash") modelId = "gemini-2.5-flash";
         if (modelId == "Gemini 2.5 Pro") modelId = "gemini-2.5-pro";
 

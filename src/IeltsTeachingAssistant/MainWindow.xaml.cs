@@ -46,22 +46,29 @@ public sealed partial class MainWindow : Window
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        if (_hasRunStartupCheck) return;
-        _hasRunStartupCheck = true;
-
-        using var scope = App.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<IeltsTeachingAssistant.Data.AppDbContext>();
-        var settings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(context.Settings);
-
-        if (settings == null || string.IsNullOrWhiteSpace(settings.AdminPassword) || string.IsNullOrWhiteSpace(settings.GcpProjectId))
+        try
         {
-            var dialog = new SetupWizardDialog(context, this) { XamlRoot = this.Content.XamlRoot };
-            await dialog.ShowAsync();
+            if (_hasRunStartupCheck) return;
+            _hasRunStartupCheck = true;
+
+            using var scope = App.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<IeltsTeachingAssistant.Data.AppDbContext>();
+            var settings = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(context.Settings);
+
+            if (settings == null || string.IsNullOrWhiteSpace(settings.AdminPassword) || string.IsNullOrWhiteSpace(settings.GcpProjectId))
+            {
+                var dialog = new SetupWizardDialog(context, this) { XamlRoot = this.Content.XamlRoot };
+                await dialog.ShowAsync();
+            }
+            else
+            {
+                var dialog = new LoginDialog(settings.AdminPassword) { XamlRoot = this.Content.XamlRoot };
+                await dialog.ShowAsync();
+            }
         }
-        else
+        catch (Exception ex)
         {
-            var dialog = new LoginDialog(settings.AdminPassword) { XamlRoot = this.Content.XamlRoot };
-            await dialog.ShowAsync();
+            System.IO.File.WriteAllText(@"d:\Project\ielts-teaching-assistant\crash2.txt", ex.ToString());
         }
     }
 
