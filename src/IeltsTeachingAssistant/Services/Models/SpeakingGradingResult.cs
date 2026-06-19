@@ -1,16 +1,31 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace IeltsTeachingAssistant.Services.Models;
 
 public class SpeakingGradingResult
 {
-    public float FluencyCoherence { get; set; }
-    public string FluencyCoherenceAIComment { get; set; } = string.Empty;
+    [JsonPropertyName("overall_calculated_band")]
+    public float OverallCalculatedBand { get; set; }
 
-    public float LexicalResource { get; set; }
-    public string LexicalResourceAIComment { get; set; } = string.Empty;
+    [JsonPropertyName("analytical_criteria_scores")]
+    public AnalyticalCriteriaScoresSpeaking AnalyticalCriteriaScores { get; set; } = new();
 
-    public float GrammaticalRange { get; set; }
-    public string GrammaticalRangeAIComment { get; set; } = string.Empty;
+    [JsonPropertyName("student_coaching")]
+    public StudentCoaching StudentCoaching { get; set; } = new();
+}
 
-    public float Pronunciation { get; set; }
-    public string PronunciationAIComment { get; set; } = string.Empty;
+public class AnalyticalCriteriaScoresSpeaking
+{
+    [JsonPropertyName("fluency_coherence")]
+    public CriterionDetail FluencyCoherence { get; set; } = new();
+
+    [JsonPropertyName("lexical_resource")]
+    public CriterionDetail LexicalResource { get; set; } = new();
+
+    [JsonPropertyName("grammatical_range_accuracy")]
+    public CriterionDetail GrammaticalRangeAccuracy { get; set; } = new();
+
+    [JsonPropertyName("pronunciation")]
+    public CriterionDetail Pronunciation { get; set; } = new();
 }

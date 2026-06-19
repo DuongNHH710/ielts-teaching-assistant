@@ -52,12 +52,12 @@ public sealed partial class SetupWizardDialog : ContentDialog
         try
         {
             var settings = await _context.Settings.FirstOrDefaultAsync() ?? new AppSettings();
-            
+
             settings.AdminPassword = PasswordBox.Password;
             settings.GcpProjectId = GcpProjectIdBox.Text;
             settings.GcpRegion = GcpRegionBox.Text;
             settings.GcpCredentialsPath = GcpCredentialsPathBox.Text;
-            
+
             if (settings.Id == 0)
             {
                 _context.Settings.Add(settings);
@@ -66,7 +66,7 @@ public sealed partial class SetupWizardDialog : ContentDialog
             {
                 _context.Settings.Update(settings);
             }
-            
+
             await _context.SaveChangesAsync();
         }
         catch (Exception ex)

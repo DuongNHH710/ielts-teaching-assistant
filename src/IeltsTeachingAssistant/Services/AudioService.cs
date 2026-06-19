@@ -11,9 +11,11 @@ public class AudioService : IAudioService
 
     private string _currentRecordingPath = string.Empty;
 
+    public event EventHandler? PlaybackStopped;
+
     public bool IsRecording { get; private set; }
     public bool IsPlaying => _waveOut?.PlaybackState == PlaybackState.Playing;
-    
+
     public TimeSpan CurrentPosition => _audioReader?.CurrentTime ?? TimeSpan.Zero;
 
     public async Task StartRecordingAsync(string outputPath)
@@ -36,7 +38,7 @@ public class AudioService : IAudioService
 
         _waveIn.StartRecording();
         IsRecording = true;
-        
+
         await Task.CompletedTask;
     }
 
@@ -63,10 +65,16 @@ public class AudioService : IAudioService
 
         _audioReader = new AudioFileReader(filePath);
         _waveOut = new WaveOutEvent();
+        _waveOut.PlaybackStopped += OnPlaybackStopped;
         _waveOut.Init(_audioReader);
         _waveOut.Play();
 
         await Task.CompletedTask;
+    }
+
+    private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        PlaybackStopped?.Invoke(this, EventArgs.Empty);
     }
 
     public void PauseAudio()
@@ -79,9 +87,13 @@ public class AudioService : IAudioService
 
     public void StopAudio()
     {
-        _waveOut?.Stop();
-        _waveOut?.Dispose();
-        _waveOut = null;
+        if (_waveOut != null)
+        {
+            _waveOut.PlaybackStopped -= OnPlaybackStopped;
+            _waveOut.Stop();
+            _waveOut.Dispose();
+            _waveOut = null;
+        }
 
         _audioReader?.Dispose();
         _audioReader = null;
@@ -101,5 +113,51 @@ public class AudioService : IAudioService
 
         using var reader = new AudioFileReader(filePath);
         return reader.TotalTime;
+    }
+
+    public int EstimateLongPauses(string filePath, double silenceThresholdDb = -40, double minimumSilenceDurationSeconds = 2.0)
+    {
+        if (!File.Exists(filePath)) return 0;
+        try
+        {
+            using var reader = new AudioFileReader(filePath);
+            var samples = new float[4096];
+            int bytesRead;
+            double silenceThresholdLinear = Math.Pow(10, silenceThresholdDb / 20.0);
+
+            int consecutiveSilentSamples = 0;
+            // Target samples is sampleRate * channels * seconds
+            int targetSilentSamples = (int)(reader.WaveFormat.SampleRate * reader.WaveFormat.Channels * minimumSilenceDurationSeconds);
+
+            int pauseCount = 0;
+            bool inSilence = false;
+
+            while ((bytesRead = reader.Read(samples, 0, samples.Length)) > 0)
+            {
+                for (int i = 0; i < bytesRead; i++)
+                {
+                    var sampleValue = Math.Abs(samples[i]);
+                    if (sampleValue < silenceThresholdLinear)
+                    {
+                        consecutiveSilentSamples++;
+                        if (consecutiveSilentSamples >= targetSilentSamples && !inSilence)
+                        {
+                            inSilence = true;
+                            pauseCount++;
+                        }
+                    }
+                    else
+                    {
+                        consecutiveSilentSamples = 0;
+                        inSilence = false;
+                    }
+                }
+            }
+            return pauseCount;
+        }
+        catch
+        {
+            return 0;
+        }
     }
 }

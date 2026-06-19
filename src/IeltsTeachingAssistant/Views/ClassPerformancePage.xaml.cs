@@ -13,8 +13,8 @@ public sealed partial class ClassPerformancePage : Page
 
     public ClassPerformancePage()
     {
-        this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<ClassPerformanceViewModel>();
+        this.InitializeComponent();
         DataContext = ViewModel;
     }
 
@@ -81,7 +81,7 @@ public sealed partial class ClassPerformancePage : Page
         {
             // fallback
         }
-        
+
         return new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
     }
 }

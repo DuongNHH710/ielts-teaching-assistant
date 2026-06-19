@@ -80,7 +80,7 @@ public partial class StudentPerformanceViewModel : ObservableObject
 
     // Charts
     [ObservableProperty]
-    private ISeries[] _trendSeries = Array.Empty<ISeries>();
+    private IEnumerable<ISeries> _trendSeries = Array.Empty<ISeries>();
 
     [ObservableProperty]
     private IEnumerable<ICartesianAxis> _xAxes = Array.Empty<ICartesianAxis>();
@@ -93,7 +93,17 @@ public partial class StudentPerformanceViewModel : ObservableObject
     private ObservableCollection<EvaluationHistoryItem> _evaluations = new();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectedEvaluationTitle))]
+    [NotifyPropertyChangedFor(nameof(SelectedEvaluationDateString))]
+    [NotifyPropertyChangedFor(nameof(SelectedEvaluationOverallBand))]
+    [NotifyPropertyChangedFor(nameof(SelectedEvaluationSubItems))]
     private EvaluationHistoryItem? _selectedEvaluation;
+
+    public string SelectedEvaluationTitle => SelectedEvaluation?.Title ?? string.Empty;
+    public string SelectedEvaluationDateString => SelectedEvaluation?.DateString ?? string.Empty;
+    public double SelectedEvaluationOverallBand => SelectedEvaluation?.OverallBand ?? 0.0;
+    public List<EvaluationSubItem> SelectedEvaluationSubItems =>
+        SelectedEvaluation?.SubItems ?? new List<EvaluationSubItem>();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EvaluationsListVisibility))]
@@ -105,6 +115,15 @@ public partial class StudentPerformanceViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isLoading = true;
+
+    [ObservableProperty]
+    private string _studentPhone = string.Empty;
+
+    [ObservableProperty]
+    private string _goalPredictionText = string.Empty;
+
+    [ObservableProperty]
+    private string _goalPredictionColor = string.Empty;
 
     public StudentPerformanceViewModel(AppDbContext context)
     {
@@ -125,6 +144,8 @@ public partial class StudentPerformanceViewModel : ObservableObject
                     .ThenInclude(e => e.Parts)
                 .Include(s => s.WritingEvaluations)
                     .ThenInclude(e => e.Tasks)
+                .Include(s => s.ReadingEvaluations)
+                .Include(s => s.ListeningEvaluations)
                 .FirstOrDefaultAsync(s => s.Id == studentId);
 
             if (student == null) return;
@@ -140,6 +161,38 @@ public partial class StudentPerformanceViewModel : ObservableObject
             AvgWriting = student.AverageWritingBand;
             AvgReading = student.AverageReadingBand;
             AvgListening = student.AverageListeningBand;
+
+            StudentPhone = student.Phone ?? "No Phone";
+
+            if (TargetBand > 0)
+            {
+                var diff = TargetBand - OverallBand;
+                if (diff <= 0)
+                {
+                    GoalPredictionText = "Target Met";
+                    GoalPredictionColor = "#10B981"; // Emerald
+                }
+                else if (diff <= 0.5)
+                {
+                    GoalPredictionText = "High Probability";
+                    GoalPredictionColor = "#10B981"; // Emerald
+                }
+                else if (diff <= 1.0)
+                {
+                    GoalPredictionText = "Medium Probability";
+                    GoalPredictionColor = "#F59E0B"; // Amber
+                }
+                else
+                {
+                    GoalPredictionText = "Requires Intervention";
+                    GoalPredictionColor = "#F43F5E"; // Rose
+                }
+            }
+            else
+            {
+                GoalPredictionText = "No Target Set";
+                GoalPredictionColor = "#9CA3AF"; // Gray
+            }
 
             // Compute sub-criteria averages for Speaking
             var spEvalsWithParts = student.SpeakingEvaluations.Where(e => e.Parts.Any()).ToList();
@@ -185,6 +238,7 @@ public partial class StudentPerformanceViewModel : ObservableObject
                         Metric2 = part.LexicalResource,
                         Metric3 = part.GrammaticalRange,
                         Metric4 = part.Pronunciation,
+                        ParentType = "Speaking",
                         Prompt = !string.IsNullOrWhiteSpace(part.Topic) ? $"Topic: {part.Topic}{(string.IsNullOrWhiteSpace(part.CueCard) ? "" : "\nCue Card: " + part.CueCard)}" : "IELTS Speaking Interview Section",
                         SubmissionText = part.Transcript ?? "(No transcript available)",
                         AIComment1 = part.FluencyCoherenceAIComment ?? string.Empty,
@@ -223,6 +277,7 @@ public partial class StudentPerformanceViewModel : ObservableObject
                         Metric2 = task.LexicalResource,
                         Metric3 = task.GrammaticalRange,
                         Metric4 = task.CoherenceCohesion,
+                        ParentType = "Writing",
                         Prompt = task.Prompt ?? string.Empty,
                         SubmissionText = task.SubmissionText ?? string.Empty,
                         AIComment1 = task.TaskAchievementAIComment ?? string.Empty,
@@ -235,6 +290,56 @@ public partial class StudentPerformanceViewModel : ObservableObject
                         TeacherComment4 = task.CoherenceCohesionTeacherComment ?? string.Empty
                     });
                 }
+
+                historyItems.Add(historyItem);
+            }
+
+            foreach (var eval in student.ReadingEvaluations)
+            {
+                var historyItem = new EvaluationHistoryItem
+                {
+                    Id = eval.Id,
+                    Type = "Reading",
+                    Icon = "\uE8C9", // Book/Read icon
+                    OverallBand = eval.BandScore,
+                    EvaluatedAt = eval.EvaluatedAt
+                };
+
+                historyItem.SubItems.Add(new EvaluationSubItem
+                {
+                    Title = "Reading Diagnostic Analysis",
+                    OverallBand = eval.BandScore,
+                    Metric1 = eval.BandScore,
+                    ParentType = "Reading",
+                    Prompt = eval.ReadingPassage ?? string.Empty,
+                    SubmissionText = eval.StudentAnswers ?? string.Empty,
+                    AIComment1 = eval.DiagnosticAnalysis ?? string.Empty
+                });
+
+                historyItems.Add(historyItem);
+            }
+
+            foreach (var eval in student.ListeningEvaluations)
+            {
+                var historyItem = new EvaluationHistoryItem
+                {
+                    Id = eval.Id,
+                    Type = "Listening",
+                    Icon = "\uE767", // Volume/Listening icon
+                    OverallBand = eval.BandScore,
+                    EvaluatedAt = eval.EvaluatedAt
+                };
+
+                historyItem.SubItems.Add(new EvaluationSubItem
+                {
+                    Title = "Listening Auditory & Spelling Analysis",
+                    OverallBand = eval.BandScore,
+                    Metric1 = eval.BandScore,
+                    ParentType = "Listening",
+                    Prompt = eval.ListeningScript ?? string.Empty,
+                    SubmissionText = eval.StudentAnswers ?? string.Empty,
+                    AIComment1 = eval.DiagnosticAnalysis ?? string.Empty
+                });
 
                 historyItems.Add(historyItem);
             }
@@ -273,8 +378,20 @@ public partial class StudentPerformanceViewModel : ObservableObject
             .Select(e => new { Date = e.EvaluatedAt, Band = e.OverallBand })
             .ToList();
 
+        var readingPoints = student.ReadingEvaluations
+            .OrderBy(e => e.EvaluatedAt)
+            .Select(e => new { Date = e.EvaluatedAt, Band = e.BandScore })
+            .ToList();
+
+        var listeningPoints = student.ListeningEvaluations
+            .OrderBy(e => e.EvaluatedAt)
+            .Select(e => new { Date = e.EvaluatedAt, Band = e.BandScore })
+            .ToList();
+
         var allDates = speakingPoints.Select(p => p.Date)
             .Concat(writingPoints.Select(p => p.Date))
+            .Concat(readingPoints.Select(p => p.Date))
+            .Concat(listeningPoints.Select(p => p.Date))
             .OrderBy(d => d)
             .Distinct()
             .ToList();
@@ -299,12 +416,32 @@ public partial class StudentPerformanceViewModel : ObservableObject
             return match?.Band ?? 0.0;
         }).ToArray();
 
+        var readingValues = allDates.Select(d =>
+        {
+            var match = readingPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault();
+            return match?.Band ?? 0.0;
+        }).ToArray();
+
+        var listeningValues = allDates.Select(d =>
+        {
+            var match = listeningPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault();
+            return match?.Band ?? 0.0;
+        }).ToArray();
+
         var overallValues = allDates.Select(d =>
         {
             var spBand = speakingPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault()?.Band ?? 0.0;
             var wrBand = writingPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault()?.Band ?? 0.0;
-            if (spBand > 0 && wrBand > 0) return (spBand + wrBand) / 2.0;
-            return spBand > 0 ? spBand : wrBand;
+            var rdBand = readingPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault()?.Band ?? 0.0;
+            var lsBand = listeningPoints.Where(p => p.Date <= d).OrderByDescending(p => p.Date).FirstOrDefault()?.Band ?? 0.0;
+            
+            var bands = new List<double>();
+            if (spBand > 0) bands.Add(spBand);
+            if (wrBand > 0) bands.Add(wrBand);
+            if (rdBand > 0) bands.Add(rdBand);
+            if (lsBand > 0) bands.Add(lsBand);
+
+            return bands.Any() ? bands.Average() : 0.0;
         }).ToArray();
 
         TrendSeries = new ISeries[]
@@ -337,6 +474,26 @@ public partial class StudentPerformanceViewModel : ObservableObject
                 Fill = null,
                 GeometrySize = 6,
                 GeometryStroke = new SolidColorPaint(SKColor.Parse("#F59E0B"), 2),
+                GeometryFill = new SolidColorPaint(SKColors.White)
+            },
+            new LineSeries<double>
+            {
+                Name = "Reading",
+                Values = readingValues,
+                Stroke = new SolidColorPaint(SKColor.Parse("#8B5CF6"), 2), // Purple
+                Fill = null,
+                GeometrySize = 6,
+                GeometryStroke = new SolidColorPaint(SKColor.Parse("#8B5CF6"), 2),
+                GeometryFill = new SolidColorPaint(SKColors.White)
+            },
+            new LineSeries<double>
+            {
+                Name = "Listening",
+                Values = listeningValues,
+                Stroke = new SolidColorPaint(SKColor.Parse("#EC4899"), 2), // Pink/Rose
+                Fill = null,
+                GeometrySize = 6,
+                GeometryStroke = new SolidColorPaint(SKColor.Parse("#EC4899"), 2),
                 GeometryFill = new SolidColorPaint(SKColors.White)
             }
         };
@@ -373,7 +530,14 @@ public class EvaluationHistoryItem
     public string OverallBandString => OverallBand.ToString("F1");
     public DateTime EvaluatedAt { get; set; }
     public string DateString => EvaluatedAt.ToString("MMM d, yyyy HH:mm");
-    public string Title => Type == "Speaking" ? "Speaking Evaluation" : "Writing Evaluation";
+    public string Title => Type switch
+    {
+        "Speaking" => "Speaking Evaluation",
+        "Writing" => "Writing Evaluation",
+        "Reading" => "Reading Diagnostic",
+        "Listening" => "Listening Diagnostic",
+        _ => "Evaluation"
+    };
     public List<EvaluationSubItem> SubItems { get; set; } = new();
 }
 
@@ -385,6 +549,8 @@ public class EvaluationSubItem
     public double Metric2 { get; set; }
     public double Metric3 { get; set; }
     public double Metric4 { get; set; }
+
+    public string ParentType { get; set; } = string.Empty;
 
     public string Label1 => Title.Contains("Part") ? "Fluency & Coherence" : "Task Achievement";
     public string Label2 => "Lexical Resource";
@@ -403,6 +569,9 @@ public class EvaluationSubItem
     public string TeacherComment2 { get; set; } = string.Empty;
     public string TeacherComment3 { get; set; } = string.Empty;
     public string TeacherComment4 { get; set; } = string.Empty;
+
+    public Microsoft.UI.Xaml.Visibility MetricsVisibility => (ParentType == "Speaking" || ParentType == "Writing") ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Microsoft.UI.Xaml.Visibility DiagnosticVisibility => (ParentType == "Reading" || ParentType == "Listening") ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
 
     public Microsoft.UI.Xaml.Visibility PromptVisibility => string.IsNullOrWhiteSpace(Prompt) ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
 

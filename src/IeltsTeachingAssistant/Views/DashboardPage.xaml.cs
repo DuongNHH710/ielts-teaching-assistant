@@ -15,8 +15,8 @@ public sealed partial class DashboardPage : Page
 
     public DashboardPage()
     {
-        this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<DashboardViewModel>();
+        this.InitializeComponent();
         DataContext = ViewModel;
 
         // Set greeting based on time of day
@@ -76,4 +76,32 @@ public sealed partial class DashboardPage : Page
         var mainWindow = App.MainWindowInstance;
         mainWindow.NavigateTo(typeof(StudentManagementPage), "add");
     }
+
+    private void ViewAllRecentActivity_Click(object sender, RoutedEventArgs e)
+    {
+        var mainWindow = App.MainWindowInstance;
+        mainWindow.NavigateTo(typeof(StudentManagementPage));
+    }
+
+    private void EvaluateNewTask_Click(object sender, RoutedEventArgs e)
+    {
+        var mainWindow = App.MainWindowInstance;
+        mainWindow.NavigateTo(typeof(EvaluationsPage));
+    }
+
+    private void ViewClasses_Click(object sender, RoutedEventArgs e)
+    {
+        var mainWindow = App.MainWindowInstance;
+        mainWindow.NavigateTo(typeof(ClassManagementPage));
+    }
+
+    private void PendingGrading_Click(object sender, RoutedEventArgs e)
+    {
+        var mainWindow = App.MainWindowInstance;
+        mainWindow.NavigateTo(typeof(StudentManagementPage));
+    }
+
+    public static Visibility AlertsListVisibility(int count) => count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    public static Visibility AlertsEmptyVisibility(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
 }
+

@@ -24,7 +24,7 @@ public sealed partial class BandDescriptorsPanel : UserControl
     private void UpdateDescriptor()
     {
         if (CriterionSelector == null || BandSelector == null || DescriptorText == null) return;
-        
+
         var criterion = (CriterionSelector.SelectedItem as ComboBoxItem)?.Content?.ToString();
         var band = (float)BandSelector.Value;
 

@@ -26,6 +26,18 @@ public class EvaluationService : IEvaluationService
         await _context.SaveChangesAsync();
     }
 
+    public async Task CreateReadingEvaluationAsync(ReadingEvaluation eval)
+    {
+        _context.ReadingEvaluations.Add(eval);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task CreateListeningEvaluationAsync(ListeningEvaluation eval)
+    {
+        _context.ListeningEvaluations.Add(eval);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<List<SpeakingEvaluation>> GetSpeakingEvaluationsForStudentAsync(int studentId)
     {
         return await _context.SpeakingEvaluations
@@ -44,16 +56,31 @@ public class EvaluationService : IEvaluationService
             .ToListAsync();
     }
 
+    public async Task<List<ReadingEvaluation>> GetReadingEvaluationsForStudentAsync(int studentId)
+    {
+        return await _context.ReadingEvaluations
+            .Where(e => e.StudentId == studentId)
+            .OrderByDescending(e => e.EvaluatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<ListeningEvaluation>> GetListeningEvaluationsForStudentAsync(int studentId)
+    {
+        return await _context.ListeningEvaluations
+            .Where(e => e.StudentId == studentId)
+            .OrderByDescending(e => e.EvaluatedAt)
+            .ToListAsync();
+    }
+
     public async Task<List<dynamic>> GetRecentEvaluationsAsync(int count)
     {
-        // Combined in DashboardViewModel already, but this is an alternative
         return await Task.FromResult(new List<dynamic>());
     }
 
     public async Task<PerformanceMetrics> GetStudentPerformanceAsync(int studentId)
     {
         var metrics = new PerformanceMetrics();
-        
+
         var hasSpeaking = await _context.SpeakingEvaluations.AnyAsync(e => e.StudentId == studentId);
         if (hasSpeaking)
         {
@@ -72,6 +99,22 @@ public class EvaluationService : IEvaluationService
             var writingQuery = _context.WritingEvaluations.AsNoTracking().Where(e => e.StudentId == studentId);
             metrics.AverageWritingBand = await writingQuery.AverageAsync(w => w.OverallBand);
             metrics.WritingTrend = await writingQuery.OrderBy(w => w.EvaluatedAt).Select(w => w.OverallBand).ToListAsync();
+        }
+
+        var hasReading = await _context.ReadingEvaluations.AnyAsync(e => e.StudentId == studentId);
+        if (hasReading)
+        {
+            var readingQuery = _context.ReadingEvaluations.AsNoTracking().Where(e => e.StudentId == studentId);
+            metrics.AverageReadingBand = await readingQuery.AverageAsync(r => r.BandScore);
+            metrics.ReadingTrend = await readingQuery.OrderBy(r => r.EvaluatedAt).Select(r => r.BandScore).ToListAsync();
+        }
+
+        var hasListening = await _context.ListeningEvaluations.AnyAsync(e => e.StudentId == studentId);
+        if (hasListening)
+        {
+            var listeningQuery = _context.ListeningEvaluations.AsNoTracking().Where(e => e.StudentId == studentId);
+            metrics.AverageListeningBand = await listeningQuery.AverageAsync(l => l.BandScore);
+            metrics.ListeningTrend = await listeningQuery.OrderBy(l => l.EvaluatedAt).Select(l => l.BandScore).ToListAsync();
         }
 
         return metrics;
@@ -94,6 +137,24 @@ public class EvaluationService : IEvaluationService
             if (eval != null)
             {
                 _context.WritingEvaluations.Remove(eval);
+                await _context.SaveChangesAsync();
+            }
+        }
+        else if (type == "Reading")
+        {
+            var eval = await _context.ReadingEvaluations.FindAsync(id);
+            if (eval != null)
+            {
+                _context.ReadingEvaluations.Remove(eval);
+                await _context.SaveChangesAsync();
+            }
+        }
+        else if (type == "Listening")
+        {
+            var eval = await _context.ListeningEvaluations.FindAsync(id);
+            if (eval != null)
+            {
+                _context.ListeningEvaluations.Remove(eval);
                 await _context.SaveChangesAsync();
             }
         }

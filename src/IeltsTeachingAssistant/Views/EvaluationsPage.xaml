@@ -1,0 +1,26 @@
+<Page
+    x:Class="IeltsTeachingAssistant.Views.EvaluationsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    NavigationCacheMode="Required">
+
+    <Grid Padding="0">
+        <Pivot x:Name="EvalPivot" SelectionChanged="EvalPivot_SelectionChanged">
+            <PivotItem Header="Reading">
+                <Frame x:Name="ReadingFrame" />
+            </PivotItem>
+            <PivotItem Header="Listening">
+                <Frame x:Name="ListeningFrame" />
+            </PivotItem>
+            <PivotItem Header="Writing">
+                <Frame x:Name="WritingFrame" />
+            </PivotItem>
+            <PivotItem Header="Speaking">
+                <Frame x:Name="SpeakingFrame" />
+            </PivotItem>
+        </Pivot>
+    </Grid>
+</Page>

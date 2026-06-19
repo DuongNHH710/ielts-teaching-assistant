@@ -2,8 +2,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IeltsTeachingAssistant.Models;
 using IeltsTeachingAssistant.Services;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Xml.Linq;
 using System.Threading.Tasks;
 using IeltsTeachingAssistant.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,14 +19,68 @@ public partial class WritingEvaluationViewModel : ObservableObject
 {
     private readonly IVertexAIService _vertexAiService;
     private readonly IEvaluationService _evaluationService;
+    private readonly AppDbContext _context;
 
     [ObservableProperty]
     private WritingEvaluation _evaluation;
 
     [ObservableProperty]
-    private System.Collections.ObjectModel.ObservableCollection<Student> _students = new();
+    private Student? _selectedStudent;
 
-    private readonly AppDbContext _context;
+    [ObservableProperty]
+    private ObservableCollection<Student> _students = new();
+
+    [ObservableProperty]
+    private int _activePivotIndex = 0;
+
+    public List<string> EvaluationModes { get; } = new()
+    {
+        "Full Test (Tasks 1 & 2)",
+        "Task 1 Only",
+        "Task 2 Only"
+    };
+
+    [ObservableProperty]
+    private string _selectedEvaluationMode = "Full Test (Tasks 1 & 2)";
+
+    partial void OnSelectedEvaluationModeChanged(string value)
+    {
+        UpdateEvaluationTasks();
+    }
+
+    private void UpdateEvaluationTasks()
+    {
+        var student = SelectedStudent;
+        var newEval = new WritingEvaluation
+        {
+            Student = student,
+            StudentId = student?.Id ?? 0,
+            EvaluationMode = SelectedEvaluationMode
+        };
+
+        if (SelectedEvaluationMode == "Full Test (Tasks 1 & 2)")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
+        }
+        else if (SelectedEvaluationMode == "Task 1 Only")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
+        }
+        else if (SelectedEvaluationMode == "Task 2 Only")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
+        }
+
+        Evaluation = newEval;
+        ActivePivotIndex = 0;
+        UpdateAverages();
+    }
+
+    partial void OnSelectedStudentChanged(Student? oldValue, Student? newValue)
+    {
+        ClearSessionInternal(newValue);
+    }
 
     private bool _isFocusMode = false;
     public bool IsFocusMode
@@ -43,19 +102,54 @@ public partial class WritingEvaluationViewModel : ObservableObject
     public WritingEvaluationViewModel(
         IVertexAIService vertexAiService,
         IEvaluationService evaluationService,
-        Data.AppDbContext context)
+        AppDbContext context)
     {
         _vertexAiService = vertexAiService;
         _evaluationService = evaluationService;
         _context = context;
 
-        _evaluation = new WritingEvaluation();
+        _evaluation = new WritingEvaluation { EvaluationMode = SelectedEvaluationMode };
         _evaluation.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = _evaluation });
         _evaluation.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = _evaluation });
-        
-        // Students are loaded via InitializeAsync()
     }
-    
+
+    private void ClearSessionInternal(Student? student)
+    {
+        var newEval = new WritingEvaluation
+        {
+            Student = student,
+            StudentId = student?.Id ?? 0,
+            EvaluationMode = SelectedEvaluationMode
+        };
+
+        if (SelectedEvaluationMode == "Full Test (Tasks 1 & 2)")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
+        }
+        else if (SelectedEvaluationMode == "Task 1 Only")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
+        }
+        else if (SelectedEvaluationMode == "Task 2 Only")
+        {
+            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
+        }
+
+        Evaluation = newEval;
+        ActivePivotIndex = 0;
+        IsErrorVisible = false;
+        ErrorMessage = string.Empty;
+        HasUnsavedChanges = false;
+    }
+
+    [RelayCommand]
+    public void ClearSession()
+    {
+        SelectedStudent = null;
+        ClearSessionInternal(null);
+    }
+
     public async Task InitializeAsync()
     {
         Students.Clear();
@@ -85,7 +179,7 @@ public partial class WritingEvaluationViewModel : ObservableObject
     private async Task GradeWithAiAsync(WritingTask task)
     {
         if (task == null) return;
-        
+
         IsErrorVisible = false;
         ErrorMessage = string.Empty;
         IsGrading = true;
@@ -96,14 +190,34 @@ public partial class WritingEvaluationViewModel : ObservableObject
             var taskTypeStr = task.TaskNumber == 1 ? (task.TaskType ?? "Graph") : "Essay";
 
             var result = await _vertexAiService.GradeWritingAsync(task.Prompt ?? "", task.SubmissionText ?? "", task.TaskNumber, "Academic", taskTypeStr);
-            task.TaskAchievement = result.TaskAchievement;
-            task.TaskAchievementAIComment = result.TaskAchievementAIComment;
-            task.CoherenceCohesion = result.CoherenceCohesion;
-            task.CoherenceCohesionAIComment = result.CoherenceCohesionAIComment;
-            task.LexicalResource = result.LexicalResource;
-            task.LexicalResourceAIComment = result.LexicalResourceAIComment;
-            task.GrammaticalRange = result.GrammaticalRange;
-            task.GrammaticalRangeAIComment = result.GrammaticalRangeAIComment;
+
+            task.TaskAchievement = result.AnalyticalCriteriaScores.TaskResponse.Band;
+            task.TaskAchievementAIComment = result.AnalyticalCriteriaScores.TaskResponse.KeyJustification;
+            task.TaskAchievementJustification = result.AnalyticalCriteriaScores.TaskResponse.KeyJustification;
+            task.TaskAchievementEvidence = string.Join("; ", result.AnalyticalCriteriaScores.TaskResponse.SupportingEvidenceQuotes);
+            task.TaskAchievementLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.TaskResponse.LimitingFactors);
+
+            task.CoherenceCohesion = result.AnalyticalCriteriaScores.CoherenceCohesion.Band;
+            task.CoherenceCohesionAIComment = result.AnalyticalCriteriaScores.CoherenceCohesion.KeyJustification;
+            task.CoherenceCohesionJustification = result.AnalyticalCriteriaScores.CoherenceCohesion.KeyJustification;
+            task.CoherenceCohesionEvidence = string.Join("; ", result.AnalyticalCriteriaScores.CoherenceCohesion.SupportingEvidenceQuotes);
+            task.CoherenceCohesionLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.CoherenceCohesion.LimitingFactors);
+
+            task.LexicalResource = result.AnalyticalCriteriaScores.LexicalResource.Band;
+            task.LexicalResourceAIComment = result.AnalyticalCriteriaScores.LexicalResource.KeyJustification;
+            task.LexicalResourceJustification = result.AnalyticalCriteriaScores.LexicalResource.KeyJustification;
+            task.LexicalResourceEvidence = string.Join("; ", result.AnalyticalCriteriaScores.LexicalResource.SupportingEvidenceQuotes);
+            task.LexicalResourceLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.LexicalResource.LimitingFactors);
+
+            task.GrammaticalRange = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.Band;
+            task.GrammaticalRangeAIComment = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.KeyJustification;
+            task.GrammaticalRangeJustification = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.KeyJustification;
+            task.GrammaticalRangeEvidence = string.Join("; ", result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.SupportingEvidenceQuotes);
+            task.GrammaticalRangeLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.LimitingFactors);
+
+            task.CoreStrengths = result.StudentCoaching.CoreStrengths;
+            task.PrimaryWeakness = result.StudentCoaching.PrimaryWeaknessToFix;
+            task.ActionablePractice = result.StudentCoaching.ActionablePracticeExercise;
 
             UpdateAverages();
             await SaveSessionAsync();
@@ -119,11 +233,11 @@ public partial class WritingEvaluationViewModel : ObservableObject
         }
     }
 
-    public double EvaluationOverallBand => Evaluation.OverallBand;
-    public double EvaluationTaskAchievement => Evaluation.TaskAchievement;
-    public double EvaluationCoherenceCohesion => Evaluation.CoherenceCohesion;
-    public double EvaluationLexicalResource => Evaluation.LexicalResource;
-    public double EvaluationGrammaticalRange => Evaluation.GrammaticalRange;
+    public double EvaluationOverallBand => Evaluation?.OverallBand ?? 0.0;
+    public double EvaluationTaskAchievement => Evaluation?.TaskAchievement ?? 0.0;
+    public double EvaluationCoherenceCohesion => Evaluation?.CoherenceCohesion ?? 0.0;
+    public double EvaluationLexicalResource => Evaluation?.LexicalResource ?? 0.0;
+    public double EvaluationGrammaticalRange => Evaluation?.GrammaticalRange ?? 0.0;
 
     partial void OnEvaluationChanged(WritingEvaluation value)
     {
@@ -140,6 +254,134 @@ public partial class WritingEvaluationViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public async Task GoToNextAsync()
+    {
+        if (IsFocusMode)
+        {
+            if (ActivePivotIndex == 0 && Evaluation.Tasks.Count > 1)
+            {
+                var task2 = Evaluation.Tasks.FirstOrDefault(t => t.TaskNumber == 2);
+                if (task2 != null)
+                {
+                    task2.SubmissionText = string.Empty;
+                }
+                ActivePivotIndex = 1;
+            }
+            else
+            {
+                await SaveSessionAndSelectNextStudentAsync();
+            }
+        }
+        else
+        {
+            await SaveSessionAndSelectNextStudentAsync();
+        }
+    }
+
+    private async Task SaveSessionAndSelectNextStudentAsync()
+    {
+        if (Evaluation.Student != null && HasUnsavedChanges)
+        {
+            await SaveSessionAsync();
+        }
+
+        if (SelectedStudent != null && Students.Count > 1)
+        {
+            var currentIndex = Students.IndexOf(SelectedStudent);
+            var nextIndex = (currentIndex + 1) % Students.Count;
+            var nextStudent = Students[nextIndex];
+
+            var oldPrompts = Evaluation.Tasks.ToDictionary(t => t.TaskNumber, t => (t.Prompt, t.TaskType));
+
+            SelectedStudent = nextStudent;
+
+            foreach (var task in Evaluation.Tasks)
+            {
+                if (oldPrompts.TryGetValue(task.TaskNumber, out var value))
+                {
+                    task.Prompt = value.Prompt;
+                    task.TaskType = value.TaskType;
+                }
+            }
+
+            ActivePivotIndex = 0;
+
+            ErrorMessage = $"Switched to student: {nextStudent.Name}. Work fields cleared, prompts preserved.";
+            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Informational;
+            IsErrorVisible = true;
+        }
+        else
+        {
+            ErrorMessage = "All students completed or only one student available.";
+            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Informational;
+            IsErrorVisible = true;
+        }
+    }
+
+    public async Task LoadDocumentContentAsync(WritingTask task, string filePath)
+    {
+        if (task == null || string.IsNullOrEmpty(filePath)) return;
+
+        IsErrorVisible = false;
+        ErrorMessage = string.Empty;
+        IsGrading = true;
+
+        try
+        {
+            string ext = Path.GetExtension(filePath).ToLower();
+            string content = "";
+
+            if (ext == ".txt")
+            {
+                content = await File.ReadAllTextAsync(filePath);
+            }
+            else if (ext == ".docx")
+            {
+                content = ExtractTextFromDocx(filePath);
+            }
+            else if (ext == ".pdf" || ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+            {
+                content = await _vertexAiService.ExtractTextFromPdfOrImageAsync(filePath);
+            }
+            else
+            {
+                throw new NotSupportedException("Unsupported file type. Please upload a TXT, DOCX, PDF, or image file.");
+            }
+
+            task.SubmissionText = content;
+            HasUnsavedChanges = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Failed to load document: {ex.Message}";
+            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+            IsErrorVisible = true;
+        }
+        finally
+        {
+            IsGrading = false;
+        }
+    }
+
+    private string ExtractTextFromDocx(string filePath)
+    {
+        using var fileStream = File.OpenRead(filePath);
+        using var archive = new ZipArchive(fileStream);
+        var entry = archive.GetEntry("word/document.xml");
+        if (entry == null) return string.Empty;
+
+        using var entryStream = entry.Open();
+        var doc = XDocument.Load(entryStream);
+
+        XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+        var paragraphs = doc.Descendants(w + "p")
+            .Select(p => string.Join("", p.Descendants(w + "t").Select(t => t.Value)));
+
+        return string.Join(Environment.NewLine, paragraphs);
+    }
+
+    [RelayCommand]
     public async Task SaveSessionAsync()
     {
         if (Evaluation.Student == null)
@@ -151,11 +393,10 @@ public partial class WritingEvaluationViewModel : ObservableObject
 
         try
         {
-            // Ensure ClassId is set from the selected Student
             Evaluation.ClassId = Evaluation.Student.ClassId;
             Evaluation.StudentId = Evaluation.Student.Id;
-            
-            // Mark Student and Class as Unchanged so EF Core doesn't try to insert them as new records
+            Evaluation.EvaluationMode = SelectedEvaluationMode;
+
             _context.Entry(Evaluation.Student).State = EntityState.Unchanged;
             if (Evaluation.Class != null)
             {
@@ -176,7 +417,7 @@ public partial class WritingEvaluationViewModel : ObservableObject
             }
 
             await _context.SaveChangesAsync();
-            
+
             HasUnsavedChanges = false;
             ErrorMessage = "Session saved successfully!";
             InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;

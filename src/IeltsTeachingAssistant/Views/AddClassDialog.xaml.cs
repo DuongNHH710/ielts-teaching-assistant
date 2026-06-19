@@ -21,13 +21,14 @@ public sealed partial class AddClassDialog : ContentDialog
         if (FriToggle.IsChecked == true) days.Add("Fri");
         if (SatToggle.IsChecked == true) days.Add("Sat");
         if (SunToggle.IsChecked == true) days.Add("Sun");
-        
+
         string time = ClassTimePicker.Time.ToString(@"hh\:mm");
         string weeklySchedule = days.Count > 0 ? $"{string.Join(", ", days)} at {time}" : $"At {time}";
 
         return new ClassEntity
         {
             Name = NameBox.Text,
+            TargetBandScore = double.IsNaN(TargetBandBox.Value) ? 7.5 : TargetBandBox.Value,
             Duration = DurationBox.Text,
             WeeklySchedule = weeklySchedule,
             Status = (StatusBox.SelectedItem as ComboBoxItem)?.Content?.ToString() == "Active" ? ClassStatus.Active : ClassStatus.Upcoming,

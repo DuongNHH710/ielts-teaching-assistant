@@ -77,7 +77,26 @@ public sealed partial class MainWindow : Window
     /// </summary>
     public void NavigateTo(Type pageType, object? parameter = null)
     {
+        if (pageType == typeof(SpeakingEvaluationPage))
+        {
+            ContentFrame.Navigate(typeof(EvaluationsPage), "Speaking");
+            NavView.SelectedItem = NavEvaluations;
+            return;
+        }
+        if (pageType == typeof(WritingEvaluationPage))
+        {
+            ContentFrame.Navigate(typeof(EvaluationsPage), "Writing");
+            NavView.SelectedItem = NavEvaluations;
+            return;
+        }
+
         ContentFrame.Navigate(pageType, parameter);
+
+        // Synchronize the navigation view selection
+        if (pageType == typeof(DashboardPage)) NavView.SelectedItem = NavDashboard;
+        else if (pageType == typeof(ClassManagementPage)) NavView.SelectedItem = NavClasses;
+        else if (pageType == typeof(StudentManagementPage)) NavView.SelectedItem = NavStudents;
+        else if (pageType == typeof(EvaluationsPage)) NavView.SelectedItem = NavEvaluations;
     }
 
     /// <summary>
@@ -126,9 +145,8 @@ public sealed partial class MainWindow : Window
         Type? pageType = tag switch
         {
             "Dashboard" => typeof(DashboardPage),
-            "Speaking" => typeof(SpeakingEvaluationPage),
-            "Writing" => typeof(WritingEvaluationPage),
             "Classes" => typeof(ClassManagementPage),
+            "Evaluations" => typeof(EvaluationsPage),
             "Students" => typeof(StudentManagementPage),
             _ => typeof(DashboardPage)
         };

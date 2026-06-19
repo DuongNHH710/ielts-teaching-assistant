@@ -36,7 +36,7 @@ public sealed partial class AddStudentDialog : ContentDialog
     {
         CheckFormComplete();
     }
-    
+
     private void CheckFormComplete()
     {
         IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(NameBox.Text) && ClassBox.SelectedItem != null;

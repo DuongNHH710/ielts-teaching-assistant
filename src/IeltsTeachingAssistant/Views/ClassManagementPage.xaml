@@ -12,51 +12,127 @@
     <Grid Padding="{StaticResource PagePadding}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <StackPanel Grid.Row="0" Spacing="24" Margin="0,0,0,24">
+        <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,16">
             <Grid>
                 <TextBlock Text="Class Management" Style="{StaticResource PageTitleStyle}" />
                 <Button Content="Add Class" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource AccentButtonStyle}" Click="AddClass_Click" />
             </Grid>
-            <TextBlock Text="Manage your classes, schedule, and students." Opacity="0.6" Margin="0,-16,0,0" />
+            <TextBlock Text="Manage your classes, schedule, and students." Opacity="0.6" Margin="0,-8,0,0" />
         </StackPanel>
+
+        <!-- Search, Sort & Pivot Tabs -->
+        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <!-- Pivot for tabs -->
+            <Pivot Grid.Column="0" SelectedIndex="{x:Bind ViewModel.SelectedTab, Mode=TwoWay}" Height="48">
+                <PivotItem Header="Active Classes" />
+                <PivotItem Header="Upcoming" />
+                <PivotItem Header="Completed" />
+            </Pivot>
+            <!-- Search Box -->
+            <TextBox Grid.Column="1" PlaceholderText="Search classes..." Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="200" />
+            <!-- Sort Dropdown -->
+            <ComboBox Grid.Column="2" SelectedValue="{x:Bind ViewModel.SortBy, Mode=TwoWay}" SelectedValuePath="Tag" VerticalAlignment="Center" Width="150" PlaceholderText="Sort by">
+                <ComboBoxItem Content="Name" Tag="Name" />
+                <ComboBoxItem Content="Progress" Tag="Progress" />
+                <ComboBoxItem Content="Overall Band" Tag="OverallBand" />
+                <ComboBoxItem Content="Start Date" Tag="StartDate" />
+            </ComboBox>
+        </Grid>
         
-        <Grid Grid.Row="1" ColumnSpacing="24">
+        <Grid Grid.Row="2" ColumnSpacing="24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="350" />
             </Grid.ColumnDefinitions>
             
-            <ListView Grid.Column="0" ItemsSource="{x:Bind ViewModel.Classes, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedClass, Mode=TwoWay}">
+            <ListView Grid.Column="0" ItemsSource="{x:Bind ViewModel.FilteredClasses, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedClass, Mode=TwoWay}" Padding="0,0,12,0">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:ClassEntity">
-                    <Grid Padding="16" Margin="0,0,0,8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="16" />
-                            <TextBlock Text="{Binding StartDate}" Opacity="0.6" FontSize="12" />
-                        </StackPanel>
-                        
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Duration}" />
-                            <TextBlock Text="{Binding WeeklySchedule}" Opacity="0.6" FontSize="12" />
-                        </StackPanel>
-                        
-                        <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center" />
-                        
-                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <TextBlock Text="{x:Bind OnlineLink}" TextTrimming="CharacterEllipsis" />
-                        </StackPanel>
-                    </Grid>
+                    <Border Margin="0,0,0,12" Style="{StaticResource CardOuterShellStyle}">
+                        <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2.5*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1.5*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1.8*" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Class Name & Type & Online Link -->
+                                <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" FontSize="16" CharacterSpacing="-10" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE787;" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{x:Bind TestType}" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <!-- Online Join Button -->
+                                    <HyperlinkButton NavigateUri="{x:Bind views:ClassManagementPage.ConvertToUri(OnlineLink), Mode=OneWay}" ToolTipService.ToolTip="Join Online Session" Visibility="{x:Bind views:ClassManagementPage.GetLinkVisibility(OnlineLink), Mode=OneWay}" Padding="0" Margin="0,2,0,0" HorizontalAlignment="Left">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <FontIcon Glyph="&#xE714;" FontSize="12" Foreground="#3B82F6"/>
+                                            <TextBlock Text="Join Class" FontSize="11" Foreground="#3B82F6"/>
+                                        </StackPanel>
+                                    </HyperlinkButton>
+                                </StackPanel>
+                                
+                                <!-- Schedule & Duration -->
+                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE789;" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{x:Bind WeeklySchedule}" FontSize="13" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE916;" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{x:Bind Duration}" FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Mode & Status badges -->
+                                <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Border Background="{ThemeResource LayerFillColorDefaultBrush}" Padding="8,3,8,3" CornerRadius="4" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <FontIcon Glyph="{x:Bind views:ClassManagementPage.GetModeIcon(Mode), Mode=OneWay}" FontSize="10" Foreground="{ThemeResource SystemAccentColor}"/>
+                                            <TextBlock Text="{x:Bind Mode}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource SystemAccentColor}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="{ThemeResource LayerFillColorDefaultBrush}" Padding="8,3,8,3" CornerRadius="4" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                                        <TextBlock Text="{x:Bind Status}" FontSize="10" FontWeight="SemiBold" Foreground="{x:Bind views:ClassManagementPage.GetStatusBrush(Status), Mode=OneWay}"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Progress Bar -->
+                                <StackPanel Grid.Column="3" Spacing="6" VerticalAlignment="Center">
+                                    <Grid>
+                                        <TextBlock Text="Progress" FontSize="11" Opacity="0.6" />
+                                        <TextBlock Text="{x:Bind views:ClassManagementPage.GetProgressText(SessionsCompleted, TotalSessions), Mode=OneWay}" FontSize="11" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                    </Grid>
+                                    <ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" />
+                                </StackPanel>
+                                
+                                <!-- Overall Class Band score vs Target -->
+                                <StackPanel Grid.Column="4" Spacing="4" VerticalAlignment="Center" HorizontalAlignment="Right" Width="120">
+                                    <Grid>
+                                        <TextBlock Text="Avg Band" FontSize="10" Opacity="0.6" />
+                                        <TextBlock Text="{x:Bind OverallBand, Mode=OneWay}" FontSize="11" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#3B82F6" />
+                                    </Grid>
+                                    <ProgressBar Value="{x:Bind OverallBand, Mode=OneWay}" Minimum="0" Maximum="9" Height="4" CornerRadius="2" Foreground="#3B82F6" Background="#E2E8F0" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Text="Target: " FontSize="8" Opacity="0.5" Foreground="#10B981" />
+                                        <TextBlock Text="{x:Bind TargetBandScore, Mode=OneWay}" FontSize="8" Opacity="0.5" Foreground="#10B981" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Border>
                 </DataTemplate>
             </ListView.ItemTemplate>
             </ListView>
@@ -71,66 +147,68 @@
                         </Grid.RowDefinitions>
                         
                         <!-- PERFORMANCE HEADER -->
-                        <Border Grid.Row="0" Margin="0,0,0,24" Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="8">
-                            <StackPanel Spacing="16">
-                                <Grid>
-                                    <TextBlock Text="PERFORMANCE" Style="{StaticResource OverlineStyle}" VerticalAlignment="Center" />
-                                    <Button Content="View Dashboard" Click="ViewPerformance_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Padding="8,4,8,4" FontSize="11" />
-                                </Grid>
-                                
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Overall Band" FontSize="14" Opacity="0.8" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind ViewModel.SelectedClass.OverallBand, Mode=OneWay}" FontWeight="Bold" FontSize="24" Foreground="{ThemeResource SystemAccentColor}" />
-                                        <TextBlock Text="{x:Bind ViewModel.SelectedClass.Trend, Mode=OneWay}" FontSize="14" Foreground="MediumSeaGreen" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
-                                    </StackPanel>
-                                </Grid>
-
-                                <Grid ColumnSpacing="16" RowSpacing="12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
+                        <Border Grid.Row="0" Margin="0,0,0,16" Style="{StaticResource CardOuterShellStyle}">
+                            <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
+                                <StackPanel Spacing="16">
+                                    <Grid>
+                                        <TextBlock Text="Performance" Style="{StaticResource OverlineStyle}" VerticalAlignment="Center" />
+                                        <Button Content="View Dashboard" Click="ViewPerformance_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Padding="8,4,8,4" FontSize="11" />
+                                    </Grid>
                                     
-                                    <!-- Reading -->
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Reading" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
-                                    <ProgressBar Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageReadingBand, Mode=OneWay}" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageReadingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Overall Band" FontSize="14" Opacity="0.8" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind ViewModel.SelectedClass.OverallBand, Mode=OneWay}" FontWeight="Bold" FontSize="24" Foreground="{ThemeResource SystemAccentColor}" />
+                                            <TextBlock Text="{x:Bind ViewModel.SelectedClass.Trend, Mode=OneWay}" FontSize="14" Foreground="MediumSeaGreen" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                                        </StackPanel>
+                                    </Grid>
 
-                                    <!-- Listening -->
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Listening" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
-                                    <ProgressBar Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageListeningBand, Mode=OneWay}" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageListeningBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+                                    <Grid ColumnSpacing="16" RowSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        
+                                        <!-- Reading -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Reading" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
+                                        <ProgressBar Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageReadingBand, Mode=OneWay}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageReadingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
 
-                                    <!-- Speaking -->
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Speaking" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
-                                    <ProgressBar Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageSpeakingBand, Mode=OneWay}" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageSpeakingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+                                        <!-- Listening -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Listening" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
+                                        <ProgressBar Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageListeningBand, Mode=OneWay}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageListeningBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
 
-                                    <!-- Writing -->
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Writing" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
-                                    <ProgressBar Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageWritingBand, Mode=OneWay}" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageWritingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
-                                </Grid>
-                            </StackPanel>
+                                        <!-- Speaking -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Speaking" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
+                                        <ProgressBar Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageSpeakingBand, Mode=OneWay}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageSpeakingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+
+                                        <!-- Writing -->
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Writing" FontSize="12" Opacity="0.6" VerticalAlignment="Center" Width="60"/>
+                                        <ProgressBar Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="9" Value="{x:Bind ViewModel.SelectedClass.AverageWritingBand, Mode=OneWay}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{x:Bind ViewModel.SelectedClass.AverageWritingBand, Mode=OneWay}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Width="24" TextAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
                         </Border>
 
                         <!-- SETTINGS -->
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <StackPanel Spacing="16">
-                                <TextBlock Text="CLASS PROFILE" Style="{StaticResource OverlineStyle}" />
+                                <TextBlock Text="Class profile" Style="{StaticResource OverlineStyle}" />
                                 <TextBox Header="Class Name" Text="{x:Bind ViewModel.SelectedClass.Name, Mode=TwoWay}" PlaceholderText="e.g. Intensive Speaking 101" />
                                 
                                 <Grid ColumnSpacing="16">
@@ -138,17 +216,25 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" Header="Duration" Text="{x:Bind ViewModel.SelectedClass.Duration, Mode=TwoWay}" PlaceholderText="e.g. 10 Weeks" />
-                                    <TextBox Grid.Column="1" Header="Schedule" Text="{x:Bind ViewModel.SelectedClass.WeeklySchedule, Mode=TwoWay}" PlaceholderText="e.g. Mon/Wed 18:00" />
+                                    <NumberBox Grid.Column="0" Header="Target Band" Value="{x:Bind ViewModel.SelectedClassTargetBand, Mode=TwoWay}" Minimum="1.0" Maximum="9.0" SmallChange="0.5" LargeChange="1.0" SpinButtonPlacementMode="Inline" />
+                                    <TextBox Grid.Column="1" Header="Duration" Text="{x:Bind ViewModel.SelectedClass.Duration, Mode=TwoWay}" PlaceholderText="e.g. 10 Weeks" />
                                 </Grid>
+
+                                <TextBox Header="Schedule" Text="{x:Bind ViewModel.SelectedClass.WeeklySchedule, Mode=TwoWay}" PlaceholderText="e.g. Mon/Wed 18:00" />
 
                                 <Grid ColumnSpacing="16">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0" Header="Status" Text="{x:Bind ViewModel.SelectedClass.Status, Mode=TwoWay}" IsReadOnly="True" />
-                                    <TextBox Grid.Column="1" Header="Mode" Text="{x:Bind ViewModel.SelectedClass.Mode, Mode=TwoWay}" IsReadOnly="True" />
+                                    <ComboBox Grid.Column="0" Header="Status" 
+                                              ItemsSource="{x:Bind ViewModel.StatusOptions, Mode=OneTime}" 
+                                              SelectedItem="{x:Bind ViewModel.SelectedClassStatus, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch" />
+                                    <ComboBox Grid.Column="1" Header="Mode" 
+                                              ItemsSource="{x:Bind ViewModel.ModeOptions, Mode=OneTime}" 
+                                              SelectedItem="{x:Bind ViewModel.SelectedClassMode, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch" />
                                 </Grid>
 
                                 <TextBox Header="Meeting Link" Text="{x:Bind ViewModel.SelectedClass.OnlineLink, Mode=TwoWay}" PlaceholderText="https://zoom.us/j/..." />
@@ -162,7 +248,38 @@
                                     <TextBox Grid.Column="1" Header="Host Key" Text="{x:Bind ViewModel.SelectedClass.OnlineHostKey, Mode=TwoWay}" />
                                 </Grid>
 
+                                <TextBlock Text="Class progress" Style="{StaticResource OverlineStyle}" Margin="0,8,0,0" />
+                                <Grid ColumnSpacing="16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <NumberBox Grid.Column="0" Header="Total sessions" 
+                                               Value="{x:Bind ViewModel.SelectedClassTotalSessions, Mode=TwoWay}" 
+                                               Minimum="0" SmallChange="1" LargeChange="5" SpinButtonPlacementMode="Inline" />
+                                    <NumberBox Grid.Column="1" Header="Sessions completed" 
+                                               Value="{x:Bind ViewModel.SelectedClassSessionsCompleted, Mode=TwoWay}" 
+                                               Minimum="0" SmallChange="1" LargeChange="5" SpinButtonPlacementMode="Inline" />
+                                </Grid>
+
+                                <StackPanel Spacing="8">
+                                    <Grid>
+                                        <TextBlock Text="Current progress" FontSize="12" Opacity="0.6" />
+                                        <TextBlock Text="{x:Bind ViewModel.SelectedClassProgressString, Mode=OneWay}" FontSize="12" HorizontalAlignment="Right" FontWeight="SemiBold" />
+                                    </Grid>
+                                    <ProgressBar Value="{x:Bind ViewModel.SelectedClassProgress, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" />
+                                </StackPanel>
+
                                 <TextBox Header="Notes" Text="{x:Bind ViewModel.SelectedClass.Notes, Mode=TwoWay}" AcceptsReturn="True" Height="100" PlaceholderText="Add private notes about this class..." TextWrapping="Wrap"/>
+
+                                <Grid ColumnSpacing="12" Margin="0,16,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Content="Save changes" Click="SaveClassChanges_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Stretch" />
+                                    <Button Grid.Column="1" Content="Delete class" Click="DeleteClass_Click" Style="{StaticResource DefaultButtonStyle}" Foreground="Red" HorizontalAlignment="Stretch" />
+                                </Grid>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>

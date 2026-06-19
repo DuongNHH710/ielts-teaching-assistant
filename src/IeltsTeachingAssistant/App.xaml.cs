@@ -46,9 +46,16 @@ public partial class App : Application
             File.WriteAllText(@"d:\Project\ielts-teaching-assistant\crash.txt", ex.ToString());
         }
 
-        this.UnhandledException += (s, e) => 
+        this.UnhandledException += (s, e) =>
         {
-            File.WriteAllText(@"d:\Project\ielts-teaching-assistant\crash.txt", e.Exception.ToString());
+            var log = $"Exception: {e.Exception}\nMessage: {e.Exception.Message}\n";
+            var inner = e.Exception?.InnerException;
+            while (inner != null)
+            {
+                log += $"Inner Exception: {inner}\nMessage: {inner.Message}\n";
+                inner = inner.InnerException;
+            }
+            File.WriteAllText(@"d:\Project\ielts-teaching-assistant\crash.txt", log);
             e.Handled = true;
         };
     }
@@ -120,6 +127,13 @@ public partial class App : Application
                 var tableName = entityType.GetTableName();
                 if (string.IsNullOrEmpty(tableName)) continue;
 
+                // Ensure the table exists in the SQLite database
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = $"CREATE TABLE IF NOT EXISTS \"{tableName}\" (\"Id\" INTEGER PRIMARY KEY AUTOINCREMENT);";
+                    cmd.ExecuteNonQuery();
+                }
+
                 var storeObject = StoreObjectIdentifier.Table(tableName, null);
 
                 // Get existing columns for this table
@@ -156,7 +170,7 @@ public partial class App : Application
 
                         var isNullable = property.IsNullable;
                         var nullableSql = isNullable ? "NULL" : "NOT NULL";
-                        
+
                         // Set defaults to avoid SQL errors when adding a non-nullable column to a populated table
                         var defaultSql = "";
                         if (!isNullable)

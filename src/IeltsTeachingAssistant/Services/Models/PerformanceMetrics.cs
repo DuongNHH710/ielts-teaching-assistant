@@ -4,7 +4,9 @@ public class PerformanceMetrics
 {
     public double AverageSpeakingBand { get; set; }
     public double AverageWritingBand { get; set; }
-    
+    public double AverageReadingBand { get; set; }
+    public double AverageListeningBand { get; set; }
+
     // Average scores for radar chart
     public double SpeakingFluency { get; set; }
     public double SpeakingLexical { get; set; }
@@ -15,9 +17,11 @@ public class PerformanceMetrics
     public double WritingCoherence { get; set; }
     public double WritingLexical { get; set; }
     public double WritingGrammar { get; set; }
-    
+
     // Time-series data for line chart
     public List<double> SpeakingTrend { get; set; } = new();
     public List<double> WritingTrend { get; set; } = new();
+    public List<double> ReadingTrend { get; set; } = new();
+    public List<double> ListeningTrend { get; set; } = new();
     public List<string> Labels { get; set; } = new();
 }

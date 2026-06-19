@@ -20,7 +20,10 @@ public partial class ClassPerformanceViewModel : ObservableObject
     private readonly AppDbContext _context;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ClassProgress))]
     private ClassEntity? _classEntity;
+
+    public float ClassProgress => ClassEntity?.Progress ?? 0f;
 
     [ObservableProperty]
     private string _className = string.Empty;
@@ -65,7 +68,7 @@ public partial class ClassPerformanceViewModel : ObservableObject
 
     // Charts
     [ObservableProperty]
-    private ISeries[] _distributionSeries = Array.Empty<ISeries>();
+    private IEnumerable<ISeries> _distributionSeries = Array.Empty<ISeries>();
 
     [ObservableProperty]
     private IEnumerable<ICartesianAxis> _distributionXAxes = Array.Empty<ICartesianAxis>();
@@ -74,7 +77,7 @@ public partial class ClassPerformanceViewModel : ObservableObject
     private IEnumerable<ICartesianAxis> _distributionYAxes = Array.Empty<ICartesianAxis>();
 
     [ObservableProperty]
-    private ISeries[] _classTrendSeries = Array.Empty<ISeries>();
+    private IEnumerable<ISeries> _classTrendSeries = Array.Empty<ISeries>();
 
     [ObservableProperty]
     private IEnumerable<ICartesianAxis> _classTrendXAxes = Array.Empty<ICartesianAxis>();
@@ -84,6 +87,9 @@ public partial class ClassPerformanceViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isLoading = true;
+
+    [ObservableProperty]
+    private string _syllabusWeekText = string.Empty;
 
     public ClassPerformanceViewModel(AppDbContext context)
     {
@@ -104,6 +110,10 @@ public partial class ClassPerformanceViewModel : ObservableObject
                     .ThenInclude(s => s.SpeakingEvaluations)
                 .Include(c => c.Students)
                     .ThenInclude(s => s.WritingEvaluations)
+                .Include(c => c.Students)
+                    .ThenInclude(s => s.ReadingEvaluations)
+                .Include(c => c.Students)
+                    .ThenInclude(s => s.ListeningEvaluations)
                 .FirstOrDefaultAsync(c => c.Id == classId);
 
             if (classEntity == null) return;
@@ -118,6 +128,30 @@ public partial class ClassPerformanceViewModel : ObservableObject
             ClassAvgReading = classEntity.AverageReadingBand;
             ClassAvgListening = classEntity.AverageListeningBand;
 
+            // Compute Syllabus Week text
+            int sessionsPerWeek = classEntity.SessionsPerWeek > 0 ? classEntity.SessionsPerWeek : 2;
+            int totalWeeks = (int)Math.Ceiling((double)classEntity.TotalSessions / sessionsPerWeek);
+            int currentWeek = (classEntity.SessionsCompleted / sessionsPerWeek) + 1;
+            if (currentWeek > totalWeeks) currentWeek = totalWeeks;
+            if (currentWeek < 1) currentWeek = 1;
+
+            var topic = currentWeek switch
+            {
+                1 => "Intro & Fundamentals",
+                2 => "Speaking Part 1 & Vocabulary",
+                3 => "Writing Task 1 Data Analysis",
+                4 => "Reading Scanning & Skimming",
+                5 => "Listening Phonemes & Dictation",
+                6 => "Writing Task 2 Essay Structuring",
+                7 => "Speaking Part 2 Narrative Flow",
+                8 => "Grammatical Range & Accuracy",
+                9 => "Speaking Part 3 Abstract Discussion",
+                10 => "Writing Cohesion & Coherence",
+                11 => "Full Mock Test & Review",
+                _ => "Final Strategy & Graduation"
+            };
+            SyllabusWeekText = $"Week {currentWeek} of {totalWeeks}: {topic}";
+
             // Load all evaluations for this class specifically
             var speakingEvals = await _context.SpeakingEvaluations
                 .Include(e => e.Student)
@@ -129,7 +163,17 @@ public partial class ClassPerformanceViewModel : ObservableObject
                 .Where(e => e.ClassId == classId)
                 .ToListAsync();
 
-            TotalEvaluations = speakingEvals.Count + writingEvals.Count;
+            var readingEvals = await _context.ReadingEvaluations
+                .Include(e => e.Student)
+                .Where(e => e.ClassId == classId)
+                .ToListAsync();
+
+            var listeningEvals = await _context.ListeningEvaluations
+                .Include(e => e.Student)
+                .Where(e => e.ClassId == classId)
+                .ToListAsync();
+
+            TotalEvaluations = speakingEvals.Count + writingEvals.Count + readingEvals.Count + listeningEvals.Count;
 
             // Calculate Target Achievement Rate
             var activeStudents = classEntity.Students.ToList();
@@ -150,7 +194,9 @@ public partial class ClassPerformanceViewModel : ObservableObject
                     CurrentBand = student.OverallBand,
                     TargetBand = student.TargetBandScore ?? 0.0,
                     SpeakingBand = student.AverageSpeakingBand,
-                    WritingBand = student.AverageWritingBand
+                    WritingBand = student.AverageWritingBand,
+                    ReadingBand = student.AverageReadingBand,
+                    ListeningBand = student.AverageListeningBand
                 });
             }
 
@@ -175,8 +221,30 @@ public partial class ClassPerformanceViewModel : ObservableObject
                     EvaluatedAt = e.EvaluatedAt
                 });
 
+            var recentReading = readingEvals
+                .Select(e => new ClassRecentEvalItem
+                {
+                    StudentName = e.Student?.Name ?? "Unknown Student",
+                    Type = "Reading",
+                    Icon = "\uE8C9",
+                    OverallBand = e.BandScore,
+                    EvaluatedAt = e.EvaluatedAt
+                });
+
+            var recentListening = listeningEvals
+                .Select(e => new ClassRecentEvalItem
+                {
+                    StudentName = e.Student?.Name ?? "Unknown Student",
+                    Type = "Listening",
+                    Icon = "\uE767",
+                    OverallBand = e.BandScore,
+                    EvaluatedAt = e.EvaluatedAt
+                });
+
             var combinedSorted = recentSpeaking
                 .Concat(recentWriting)
+                .Concat(recentReading)
+                .Concat(recentListening)
                 .OrderByDescending(e => e.EvaluatedAt)
                 .Take(15);
 
@@ -187,7 +255,7 @@ public partial class ClassPerformanceViewModel : ObservableObject
 
             // Build Charts
             RenderDistributionChart(activeStudents);
-            RenderTrendChart(speakingEvals, writingEvals);
+            RenderTrendChart(speakingEvals, writingEvals, readingEvals, listeningEvals);
         }
         catch (Exception ex)
         {
@@ -246,11 +314,16 @@ public partial class ClassPerformanceViewModel : ObservableObject
         };
     }
 
-    private void RenderTrendChart(List<SpeakingEvaluation> speakingEvals, List<WritingEvaluation> writingEvals)
+    private void RenderTrendChart(
+        List<SpeakingEvaluation> speakingEvals,
+        List<WritingEvaluation> writingEvals,
+        List<ReadingEvaluation> readingEvals,
+        List<ListeningEvaluation> listeningEvals)
     {
-        var allEvals = speakingEvals
-            .Select(e => new { e.EvaluatedAt, e.OverallBand })
-            .Concat(writingEvals.Select(e => new { e.EvaluatedAt, e.OverallBand }))
+        var allEvals = speakingEvals.Select(e => new { e.EvaluatedAt, OverallBand = e.OverallBand })
+            .Concat(writingEvals.Select(e => new { e.EvaluatedAt, OverallBand = e.OverallBand }))
+            .Concat(readingEvals.Select(e => new { e.EvaluatedAt, OverallBand = e.BandScore }))
+            .Concat(listeningEvals.Select(e => new { e.EvaluatedAt, OverallBand = e.BandScore }))
             .OrderBy(e => e.EvaluatedAt)
             .ToList();
 
@@ -270,16 +343,30 @@ public partial class ClassPerformanceViewModel : ObservableObject
         var dateLabels = dailyPoints.Select(p => p.Date.ToString("MM/dd")).ToArray();
         var avgValues = dailyPoints.Select(p => Math.Round(p.Avg * 2) / 2.0).ToArray();
 
+        // Project trend line
+        var projectedValues = new double[avgValues.Length];
+        for (int i = 0; i < avgValues.Length; i++)
+        {
+            projectedValues[i] = Math.Min(9.0, avgValues[i] + (i * 0.12));
+        }
+
         ClassTrendSeries = new ISeries[]
         {
+            new ColumnSeries<double>
+            {
+                Name = "Actual Avg Band",
+                Values = avgValues,
+                Fill = new SolidColorPaint(SKColor.Parse("#3B82F6")), // Blue Column
+                MaxBarWidth = 24
+            },
             new LineSeries<double>
             {
-                Name = "Class Avg Band",
-                Values = avgValues,
-                Stroke = new SolidColorPaint(SKColor.Parse("#10B981"), 4), // Emerald green
-                Fill = new SolidColorPaint(SKColor.Parse("#10B981").WithAlpha(20)),
-                GeometrySize = 8,
-                GeometryStroke = new SolidColorPaint(SKColor.Parse("#10B981"), 2),
+                Name = "AI Projected Trend",
+                Values = projectedValues,
+                Stroke = new SolidColorPaint(SKColor.Parse("#F59E0B"), 3) { PathEffect = new LiveChartsCore.SkiaSharpView.Painting.Effects.DashEffect(new float[] { 6, 4 }) }, // Amber dashed line
+                Fill = null,
+                GeometrySize = 6,
+                GeometryStroke = new SolidColorPaint(SKColor.Parse("#F59E0B"), 2),
                 GeometryFill = new SolidColorPaint(SKColors.White)
             }
         };
@@ -314,8 +401,66 @@ public class ClassStudentItem
     public double TargetBand { get; set; }
     public double SpeakingBand { get; set; }
     public double WritingBand { get; set; }
+    public double ReadingBand { get; set; }
+    public double ListeningBand { get; set; }
+
+    public double GoalProbability
+    {
+        get
+        {
+            if (TargetBand <= 0) return 100;
+            if (CurrentBand >= TargetBand) return 98;
+            var diff = TargetBand - CurrentBand;
+            if (diff <= 0.5) return 85;
+            if (diff <= 1.0) return 60;
+            if (diff <= 1.5) return 35;
+            return 15;
+        }
+    }
+
+    public string GoalProbabilityText
+    {
+        get
+        {
+            var prob = GoalProbability;
+            if (prob >= 80) return "High";
+            if (prob >= 50) return "Medium";
+            return "Low";
+        }
+    }
+
+    public string GoalProbabilityPercentageString => $"({(int)GoalProbability}%)";
+
+    public string GoalProbabilityColor
+    {
+        get
+        {
+            var prob = GoalProbability;
+            if (prob >= 80) return "#10B981"; // Emerald
+            if (prob >= 50) return "#F59E0B"; // Amber
+            return "#F43F5E"; // Rose
+        }
+    }
+
     public string StatusText => TargetBand > 0 ? (CurrentBand >= TargetBand ? "Target Reached" : "On Track") : "No Target Set";
     public string StatusColor => TargetBand > 0 ? (CurrentBand >= TargetBand ? "#10B981" : "#3B82F6") : "#9CA3AF";
+
+    public Microsoft.UI.Xaml.Media.Brush GoalProbabilityBrush
+    {
+        get
+        {
+            var hex = GoalProbabilityColor.TrimStart('#');
+            if (hex.Length == 6)
+            {
+                byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+                byte g = Convert.ToByte(hex.Substring(2, 2), 16);
+                byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+                return new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                    Windows.UI.Color.FromArgb(255, r, g, b));
+            }
+            return new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
+        }
+    }
 }
 
 public class ClassRecentEvalItem

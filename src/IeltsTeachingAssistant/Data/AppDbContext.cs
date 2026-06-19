@@ -18,6 +18,8 @@ public class AppDbContext : DbContext
     public DbSet<SpeakingPart> SpeakingParts { get; set; } = null!;
     public DbSet<WritingEvaluation> WritingEvaluations { get; set; } = null!;
     public DbSet<WritingTask> WritingTasks { get; set; } = null!;
+    public DbSet<ReadingEvaluation> ReadingEvaluations { get; set; } = null!;
+    public DbSet<ListeningEvaluation> ListeningEvaluations { get; set; } = null!;
     public DbSet<FeedbackTemplate> FeedbackTemplates { get; set; } = null!;
     public DbSet<AppSettings> Settings { get; set; } = null!;
 
@@ -73,5 +75,33 @@ public class AppDbContext : DbContext
             .WithOne(t => t.Evaluation)
             .HasForeignKey(t => t.EvaluationId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Student -> ReadingEvaluation (One-to-Many)
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.ReadingEvaluations)
+            .WithOne(e => e.Student)
+            .HasForeignKey(e => e.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Class -> ReadingEvaluation (One-to-Many)
+        modelBuilder.Entity<ReadingEvaluation>()
+            .HasOne(e => e.Class)
+            .WithMany()
+            .HasForeignKey(e => e.ClassId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Student -> ListeningEvaluation (One-to-Many)
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.ListeningEvaluations)
+            .WithOne(e => e.Student)
+            .HasForeignKey(e => e.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Class -> ListeningEvaluation (One-to-Many)
+        modelBuilder.Entity<ListeningEvaluation>()
+            .HasOne(e => e.Class)
+            .WithMany()
+            .HasForeignKey(e => e.ClassId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

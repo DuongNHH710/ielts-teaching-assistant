@@ -11,6 +11,7 @@
 
     <StackPanel Spacing="16" Width="300" Margin="0,16,0,0">
         <TextBox x:Name="NameBox" Header="Class Name" TextChanged="Field_Changed" />
+        <NumberBox x:Name="TargetBandBox" Header="Target Band Score" Value="7.5" Minimum="1.0" Maximum="9.0" SmallChange="0.5" LargeChange="1.0" SpinButtonPlacementMode="Inline" />
         <TextBox x:Name="DurationBox" Header="Duration (e.g. 10 weeks or 20 sessions)" TextChanged="Field_Changed" />
         
         <TextBlock Text="Schedule" Margin="0,8,0,0" />

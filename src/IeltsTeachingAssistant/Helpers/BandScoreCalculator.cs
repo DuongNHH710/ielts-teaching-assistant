@@ -22,7 +22,7 @@ public static class BandScoreCalculator
             return floor + 1.0;
         if (fraction >= 0.25)
             return floor + 0.5;
-            
+
         return floor;
     }
 

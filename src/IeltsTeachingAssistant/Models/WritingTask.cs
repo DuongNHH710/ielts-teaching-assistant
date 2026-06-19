@@ -40,7 +40,7 @@ public partial class WritingTask : ObservableObject
 
     [ObservableProperty]
     private double _grammaticalRange;
-    
+
     public double OverallBand => Math.Round((TaskAchievement + CoherenceCohesion + LexicalResource + GrammaticalRange) / 4.0 * 2) / 2.0;
 
     [ObservableProperty]
@@ -66,4 +66,39 @@ public partial class WritingTask : ObservableObject
 
     [ObservableProperty]
     private string? _grammaticalRangeTeacherComment;
+
+    [ObservableProperty]
+    private string? _taskAchievementJustification;
+    [ObservableProperty]
+    private string? _taskAchievementEvidence;
+    [ObservableProperty]
+    private string? _taskAchievementLimitingFactors;
+
+    [ObservableProperty]
+    private string? _coherenceCohesionJustification;
+    [ObservableProperty]
+    private string? _coherenceCohesionEvidence;
+    [ObservableProperty]
+    private string? _coherenceCohesionLimitingFactors;
+
+    [ObservableProperty]
+    private string? _lexicalResourceJustification;
+    [ObservableProperty]
+    private string? _lexicalResourceEvidence;
+    [ObservableProperty]
+    private string? _lexicalResourceLimitingFactors;
+
+    [ObservableProperty]
+    private string? _grammaticalRangeJustification;
+    [ObservableProperty]
+    private string? _grammaticalRangeEvidence;
+    [ObservableProperty]
+    private string? _grammaticalRangeLimitingFactors;
+
+    [ObservableProperty]
+    private string? _coreStrengths;
+    [ObservableProperty]
+    private string? _primaryWeakness;
+    [ObservableProperty]
+    private string? _actionablePractice;
 }

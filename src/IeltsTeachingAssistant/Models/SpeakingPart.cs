@@ -22,10 +22,10 @@ public partial class SpeakingPart : ObservableObject
 
     [ObservableProperty]
     private string? _topic;
-    
+
     [ObservableProperty]
     private string? _cueCard;
-    
+
     [ObservableProperty]
     private string? _transcript;
 
@@ -66,4 +66,71 @@ public partial class SpeakingPart : ObservableObject
 
     [ObservableProperty]
     private string? _pronunciationTeacherComment;
+
+    [ObservableProperty]
+    private string? _fluencyCoherenceJustification;
+    [ObservableProperty]
+    private string? _fluencyCoherenceEvidence;
+    [ObservableProperty]
+    private string? _fluencyCoherenceLimitingFactors;
+
+    [ObservableProperty]
+    private string? _lexicalResourceJustification;
+    [ObservableProperty]
+    private string? _lexicalResourceEvidence;
+    [ObservableProperty]
+    private string? _lexicalResourceLimitingFactors;
+
+    [ObservableProperty]
+    private string? _grammaticalRangeJustification;
+    [ObservableProperty]
+    private string? _grammaticalRangeEvidence;
+    [ObservableProperty]
+    private string? _grammaticalRangeLimitingFactors;
+
+    [ObservableProperty]
+    private string? _pronunciationJustification;
+    [ObservableProperty]
+    private string? _pronunciationEvidence;
+    [ObservableProperty]
+    private string? _pronunciationLimitingFactors;
+
+    [ObservableProperty]
+    private string? _coreStrengths;
+    [ObservableProperty]
+    private string? _primaryWeakness;
+    [ObservableProperty]
+    private string? _actionablePractice;
+
+    private bool _isTranscribing;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsTranscribing
+    {
+        get => _isTranscribing;
+        set => SetProperty(ref _isTranscribing, value);
+    }
+
+    private bool _isRecording;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsRecording
+    {
+        get => _isRecording;
+        set => SetProperty(ref _isRecording, value);
+    }
+
+    private bool _isPlaying;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsPlaying
+    {
+        get => _isPlaying;
+        set => SetProperty(ref _isPlaying, value);
+    }
+
+    private bool _isGrading;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IsGrading
+    {
+        get => _isGrading;
+        set => SetProperty(ref _isGrading, value);
+    }
 }

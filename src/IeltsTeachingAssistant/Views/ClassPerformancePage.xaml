@@ -38,13 +38,27 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid RowSpacing="24">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> <!-- Syllabus Progress Stepper -->
                     <RowDefinition Height="Auto" /> <!-- Summary Cards -->
                     <RowDefinition Height="Auto" /> <!-- Charts -->
                     <RowDefinition Height="*" />    <!-- Student List & Recent Evals -->
                 </Grid.RowDefinitions>
 
+                <!-- 0. SYLLABUS PROGRESS STEPPER -->
+                <Border Grid.Row="0" Style="{StaticResource CardOuterShellStyle}">
+                    <Border Style="{StaticResource PremiumCardStyle}" Padding="20,16">
+                        <StackPanel Spacing="10">
+                            <Grid>
+                                <TextBlock Text="Syllabus Progress Stepper" Style="{StaticResource OverlineStyle}" VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Bind ViewModel.SyllabusWeekText, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="#3B82F6" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <ProgressBar Value="{x:Bind ViewModel.ClassProgress, Mode=OneWay}" Minimum="0" Maximum="100" Height="8" CornerRadius="4" Foreground="#10B981" Background="#E2E8F0" />
+                        </StackPanel>
+                    </Border>
+                </Border>
+
                 <!-- 1. SUMMARY CARDS -->
-                <Grid Grid.Row="0" ColumnSpacing="16">
+                <Grid Grid.Row="1" ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -122,7 +136,7 @@
                 </Grid>
 
                 <!-- 2. CHARTS -->
-                <Grid Grid.Row="1" ColumnSpacing="24">
+                <Grid Grid.Row="2" ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -158,7 +172,7 @@
                 </Grid>
 
                 <!-- 3. STUDENT ROSTER & RECENT EVALUATIONS -->
-                <Grid Grid.Row="2" Height="500" ColumnSpacing="24">
+                <Grid Grid.Row="3" Height="500" ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="1*" />
@@ -180,21 +194,25 @@
                                     <ListView.Header>
                                         <Grid Padding="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="3*" />
-                                                <ColumnDefinition Width="1*" />
-                                                <ColumnDefinition Width="1*" />
-                                                <ColumnDefinition Width="1.2*" />
-                                                <ColumnDefinition Width="1.2*" />
                                                 <ColumnDefinition Width="2.5*" />
-                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="0.9*" />
+                                                <ColumnDefinition Width="0.9*" />
+                                                <ColumnDefinition Width="0.9*" />
+                                                <ColumnDefinition Width="0.9*" />
+                                                <ColumnDefinition Width="1*" />
+                                                <ColumnDefinition Width="1*" />
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="1.2*" />
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Grid.Column="0" Text="NAME" FontSize="11" FontWeight="Bold" Opacity="0.6" />
-                                            <TextBlock Grid.Column="1" Text="SPEAKING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
-                                            <TextBlock Grid.Column="2" Text="WRITING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
-                                            <TextBlock Grid.Column="3" Text="OVERALL" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
-                                            <TextBlock Grid.Column="4" Text="TARGET" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
-                                            <TextBlock Grid.Column="5" Text="STATUS" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
-                                            <TextBlock Grid.Column="6" Text="ACTION" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Right" />
+                                            <TextBlock Grid.Column="1" Text="READING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="LISTENING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="3" Text="SPEAKING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="4" Text="WRITING" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="5" Text="OVERALL" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="6" Text="TARGET" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="7" Text="AI GOAL PROB." FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Center" />
+                                            <TextBlock Grid.Column="8" Text="ACTION" FontSize="11" FontWeight="Bold" Opacity="0.6" HorizontalAlignment="Right" />
                                         </Grid>
                                     </ListView.Header>
 
@@ -202,37 +220,48 @@
                                         <DataTemplate x:DataType="vm:ClassStudentItem">
                                             <Grid Padding="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="3*" />
-                                                    <ColumnDefinition Width="1*" />
-                                                    <ColumnDefinition Width="1*" />
-                                                    <ColumnDefinition Width="1.2*" />
-                                                    <ColumnDefinition Width="1.2*" />
                                                     <ColumnDefinition Width="2.5*" />
-                                                    <ColumnDefinition Width="1.5*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="0.9*" />
+                                                    <ColumnDefinition Width="1*" />
+                                                    <ColumnDefinition Width="1*" />
+                                                    <ColumnDefinition Width="2*" />
+                                                    <ColumnDefinition Width="1.2*" />
                                                 </Grid.ColumnDefinitions>
 
                                                 <!-- Student Name -->
                                                 <TextBlock Grid.Column="0" Text="{x:Bind Name}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" />
 
-                                                <!-- Speaking Average -->
-                                                <TextBlock Grid.Column="1" Text="{x:Bind SpeakingBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <!-- Reading -->
+                                                <TextBlock Grid.Column="1" Text="{x:Bind ReadingBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-                                                <!-- Writing Average -->
-                                                <TextBlock Grid.Column="2" Text="{x:Bind WritingBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <!-- Listening -->
+                                                <TextBlock Grid.Column="2" Text="{x:Bind ListeningBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                                                <!-- Speaking -->
+                                                <TextBlock Grid.Column="3" Text="{x:Bind SpeakingBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                                                <!-- Writing -->
+                                                <TextBlock Grid.Column="4" Text="{x:Bind WritingBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                                                 <!-- Overall Band -->
-                                                <TextBlock Grid.Column="3" Text="{x:Bind CurrentBand}" FontSize="14" FontWeight="Bold" Foreground="{ThemeResource SystemAccentColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="5" Text="{x:Bind CurrentBand}" FontSize="14" FontWeight="Bold" Foreground="{ThemeResource SystemAccentColor}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                                                 <!-- Target Band -->
-                                                <TextBlock Grid.Column="4" Text="{x:Bind TargetBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="6" Text="{x:Bind TargetBand}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-                                                <!-- Status Badge -->
-                                                <Border Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="8,4,8,4" CornerRadius="4" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                                                    <TextBlock Text="{x:Bind StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="{x:Bind views:ClassPerformancePage.ConvertHexToBrush(StatusColor)}" />
+                                                <!-- Goal Probability Badge -->
+                                                <Border Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="8,4,8,4" CornerRadius="4" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Text="{x:Bind GoalProbabilityText}" FontSize="11" FontWeight="SemiBold" Foreground="{x:Bind GoalProbabilityBrush}" />
+                                                        <TextBlock Text="{x:Bind GoalProbabilityPercentageString}" FontSize="10" Opacity="0.7" Foreground="{x:Bind GoalProbabilityBrush}" />
+                                                    </StackPanel>
                                                 </Border>
 
                                                 <!-- Action Button -->
-                                                <Button Grid.Column="6" Content="View Stats" FontSize="11" Click="ViewStudentStats_Click" Tag="{x:Bind Id}" Style="{StaticResource DefaultButtonStyle}" Padding="8,4,8,4" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                <Button Grid.Column="8" Content="View Stats" FontSize="11" Click="ViewStudentStats_Click" Tag="{x:Bind Id}" Style="{StaticResource DefaultButtonStyle}" Padding="8,4,8,4" HorizontalAlignment="Right" VerticalAlignment="Center" />
                                             </Grid>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>

@@ -15,16 +15,31 @@
             <StackPanel Spacing="16">
                 
                 <TextBox Header="Task Type" Text="{Binding TaskType, Mode=TwoWay}" 
-                         Visibility="{x:Bind views:WritingEvaluationPage.Task1Visibility(TaskNumber)}" />
+                          Visibility="{x:Bind views:WritingEvaluationPage.Task1Visibility(TaskNumber)}" />
                 
                 <TextBox Header="Writing Prompt" Text="{Binding Prompt, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="80" />
                 
                 <TextBox Header="Submission Text" Text="{Binding SubmissionText, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="200" />
                 
-                <Button Content="Auto-Grade with AI" 
-                        Command="{Binding ElementName=RootPage, Path=ViewModel.GradeWithAiCommand}" 
-                        CommandParameter="{Binding}" 
-                        HorizontalAlignment="Right" />
+                <!-- Action Buttons: Upload and Grade -->
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Click="UploadDocumentButton_Click" CommandParameter="{Binding}" Style="{StaticResource DefaultButtonStyle}" Height="40">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE898;" FontSize="14" />
+                            <TextBlock Text="Upload File" />
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="1" Content="Auto-Grade with AI" 
+                            Command="{Binding ElementName=RootPage, Path=ViewModel.GradeWithAiCommand}" 
+                            CommandParameter="{Binding}" 
+                            Style="{StaticResource AccentButtonStyle}"
+                            Height="40" Padding="24,0"
+                            HorizontalAlignment="Right" />
+                </Grid>
 
                 <!-- Criteria 2x2 Grid -->
                 <Grid ColumnSpacing="16" RowSpacing="16">
@@ -41,7 +56,7 @@
                     <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardOuterShellStyle}">
                         <Border Style="{StaticResource PremiumCardStyle}" Padding="16">
                             <StackPanel Spacing="8">
-                                <TextBlock Text="Task Achievement" FontWeight="SemiBold" />
+                                <TextBlock Text="Task Achievement / Task Response" FontWeight="SemiBold" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -50,7 +65,9 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding TaskAchievement, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding TaskAchievement}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding TaskAchievementAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding TaskAchievementJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding TaskAchievementEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
+                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding TaskAchievementLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding TaskAchievementTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -69,7 +86,9 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding CoherenceCohesion, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding CoherenceCohesion}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding CoherenceCohesionAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding CoherenceCohesionJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding CoherenceCohesionEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
+                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding CoherenceCohesionLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding CoherenceCohesionTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -88,7 +107,9 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding LexicalResource, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding LexicalResource}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding LexicalResourceAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding LexicalResourceJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding LexicalResourceEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
+                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding LexicalResourceLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding LexicalResourceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -107,12 +128,34 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding GrammaticalRange, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding GrammaticalRange}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Comment" IsReadOnly="True" Text="{Binding GrammaticalRangeAIComment, Mode=TwoWay}" TextWrapping="Wrap" />
+                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding GrammaticalRangeJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding GrammaticalRangeEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
+                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding GrammaticalRangeLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding GrammaticalRangeTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>
                 </Grid>
+
+                <!-- Pedagogical Coaching suggestions card -->
+                <Border Style="{StaticResource CardOuterShellStyle}">
+                    <Border Style="{StaticResource PremiumCardStyle}" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="16">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="AI Pedagogical Coaching &amp; Suggestions" FontSize="16" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBox Header="Core Strengths" IsReadOnly="True" Text="{Binding CoreStrengths, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                            <TextBox Header="Primary Weakness to Fix" IsReadOnly="True" Text="{Binding PrimaryWeakness, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                            <TextBox Header="Actionable Practice Exercise" IsReadOnly="True" Text="{Binding ActionablePractice, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="80" />
+                        </StackPanel>
+                    </Border>
+                </Border>
+
+                <!-- Next button to clear field and transition -->
+                <Button Command="{Binding ElementName=RootPage, Path=ViewModel.GoToNextCommand}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Padding="32,8" Height="42">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Next" FontWeight="SemiBold" />
+                        <FontIcon Glyph="&#xE72A;" FontSize="12" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
@@ -136,7 +179,15 @@
                  Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
                  Margin="0,0,0,16"/>
         
-        <ComboBox Grid.Row="2" Header="Student" ItemsSource="{x:Bind ViewModel.Students, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind ViewModel.Evaluation.Student, Mode=TwoWay}" PlaceholderText="Select student..." HorizontalAlignment="Stretch" Margin="0,0,0,16" />
+        <!-- Selection Grid: Student and Mode -->
+        <Grid Grid.Row="2" ColumnSpacing="16" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" Header="Student" ItemsSource="{x:Bind ViewModel.Students, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind ViewModel.SelectedStudent, Mode=TwoWay}" PlaceholderText="Select student..." HorizontalAlignment="Stretch" />
+            <ComboBox Grid.Column="1" Header="Evaluation Mode" ItemsSource="{x:Bind ViewModel.EvaluationModes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedEvaluationMode, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+        </Grid>
 
         <!-- Horizontal Session Summary -->
         <Border Grid.Row="3" Margin="0,0,0,24" Style="{StaticResource CardOuterShellStyle}">
@@ -169,6 +220,7 @@
                             <TextBlock Text="{x:Bind ViewModel.EvaluationGrammaticalRange, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Content="Save Session" Command="{x:Bind ViewModel.SaveSessionCommand}" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
+                        <Button Content="Clear Session" Command="{x:Bind ViewModel.ClearSessionCommand}" Style="{StaticResource DefaultButtonStyle}" Margin="8,0,0,0" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -194,7 +246,7 @@
             </ScrollViewer>
 
             <!-- FOCUS MODE -->
-            <Pivot Visibility="{x:Bind ViewModel.FocusModeVisibility, Mode=OneWay}" ItemsSource="{x:Bind ViewModel.Evaluation.Tasks}">
+            <Pivot Visibility="{x:Bind ViewModel.FocusModeVisibility, Mode=OneWay}" SelectedIndex="{x:Bind ViewModel.ActivePivotIndex, Mode=TwoWay}" ItemsSource="{x:Bind ViewModel.Evaluation.Tasks}">
                 <Pivot.HeaderTemplate>
                     <DataTemplate x:DataType="models:WritingTask">
                         <TextBlock Text="{x:Bind views:WritingEvaluationPage.FormatTaskTitle(TaskNumber)}" />

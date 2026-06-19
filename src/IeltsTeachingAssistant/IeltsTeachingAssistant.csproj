@@ -64,4 +64,16 @@
   <ItemGroup>
     <PRIResource Include="Strings\**\*.resw" />
   </ItemGroup>
+
+  <!-- Copy Views and Controls subfolders containing .xbf files to the publish directory -->
+  <Target Name="CopyXamlSubfoldersToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <XamlSubfolders Include="$(OutputPath)Views\**\*.xbf" />
+      <XamlSubfolders Include="$(OutputPath)Controls\**\*.xbf" />
+    </ItemGroup>
+    <Copy SourceFiles="@(XamlSubfolders)" 
+          DestinationFolder="$(PublishDir)%(RecursiveDir)" 
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>
+

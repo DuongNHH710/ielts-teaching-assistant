@@ -13,8 +13,8 @@ public sealed partial class StudentPerformancePage : Page
 
     public StudentPerformancePage()
     {
-        this.InitializeComponent();
         ViewModel = App.Services.GetRequiredService<StudentPerformanceViewModel>();
+        this.InitializeComponent();
         DataContext = ViewModel;
     }
 
@@ -43,5 +43,37 @@ public sealed partial class StudentPerformancePage : Page
     public static Visibility DetailViewContentVisibility(EvaluationHistoryItem? item)
     {
         return item != null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public static Microsoft.UI.Xaml.Media.Brush ConvertHexToBrush(string hex)
+    {
+        if (string.IsNullOrEmpty(hex))
+            return new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
+
+        hex = hex.Replace("#", "");
+        try
+        {
+            if (hex.Length == 6)
+            {
+                byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+                byte g = Convert.ToByte(hex.Substring(2, 2), 16);
+                byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+                return new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, r, g, b));
+            }
+            else if (hex.Length == 8)
+            {
+                byte a = Convert.ToByte(hex.Substring(0, 2), 16);
+                byte r = Convert.ToByte(hex.Substring(2, 2), 16);
+                byte g = Convert.ToByte(hex.Substring(4, 2), 16);
+                byte b = Convert.ToByte(hex.Substring(6, 2), 16);
+                return new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(a, r, g, b));
+            }
+        }
+        catch
+        {
+            // fallback
+        }
+
+        return new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
     }
 }

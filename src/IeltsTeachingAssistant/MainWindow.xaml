@@ -34,40 +34,25 @@
             <!-- Navigation Menu Items -->
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Name="NavDashboard"
-                                    Content="Dashboard" Tag="Dashboard"
-                                    Icon="Home" />
-
-                <NavigationViewItemSeparator />
-
-                <NavigationViewItemHeader Content="EVALUATIONS" />
-
-                <NavigationViewItem x:Name="NavSpeaking"
-                                    Content="Speaking Test" Tag="Speaking">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE720;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItem x:Name="NavWriting"
-                                    Content="Writing Test" Tag="Writing">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE70F;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItemSeparator />
-
-                <NavigationViewItemHeader Content="MANAGEMENT" />
+                                     Content="Dashboard" Tag="Dashboard"
+                                     Icon="Home" />
 
                 <NavigationViewItem x:Name="NavClasses"
-                                    Content="Classes" Tag="Classes">
+                                     Content="Classes" Tag="Classes">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE902;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
+                <NavigationViewItem x:Name="NavEvaluations"
+                                     Content="Evaluation Workspace" Tag="Evaluations">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xECAD;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
                 <NavigationViewItem x:Name="NavStudents"
-                                    Content="Students" Tag="Students">
+                                     Content="Student Profiles" Tag="Students">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE716;" />
                     </NavigationViewItem.Icon>

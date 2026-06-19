@@ -15,11 +15,11 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task SetupPasswordAsync(string password)
     {
-        var settings = await _context.Settings.FirstOrDefaultAsync() 
+        var settings = await _context.Settings.FirstOrDefaultAsync()
                        ?? new IeltsTeachingAssistant.Models.AppSettings();
-        
+
         settings.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
-        
+
         if (settings.Id == 0)
         {
             _context.Settings.Add(settings);

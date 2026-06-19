@@ -1,3 +1,4 @@
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IeltsTeachingAssistant.Data;
@@ -24,6 +25,38 @@ public partial class StudentManagementViewModel : ObservableObject
         LoadDataCommand = new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(LoadDataAsync);
     }
 
+    partial void OnSelectedStudentChanged(Student? value)
+    {
+        OnPropertyChanged(nameof(SelectedStudentTargetBandScore));
+        OnPropertyChanged(nameof(SelectedStudentClassId));
+    }
+
+    public double SelectedStudentTargetBandScore
+    {
+        get => SelectedStudent?.TargetBandScore ?? 0.0;
+        set
+        {
+            if (SelectedStudent != null)
+            {
+                SelectedStudent.TargetBandScore = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public int SelectedStudentClassId
+    {
+        get => SelectedStudent?.ClassId ?? 0;
+        set
+        {
+            if (SelectedStudent != null && value > 0 && SelectedStudent.ClassId != value)
+            {
+                SelectedStudent.ClassId = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public CommunityToolkit.Mvvm.Input.IAsyncRelayCommand LoadDataCommand { get; }
 
     private async System.Threading.Tasks.Task LoadDataAsync()
@@ -31,10 +64,10 @@ public partial class StudentManagementViewModel : ObservableObject
         var students = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
             Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.Include(
                 Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.Include(
-                    Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.Include(_context.Students, s => s.Class), 
+                    Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.Include(_context.Students, s => s.Class),
                     s => s.SpeakingEvaluations),
                 s => s.WritingEvaluations));
-                
+
         Students.Clear();
         foreach (var s in students)
         {
@@ -53,8 +86,26 @@ public partial class StudentManagementViewModel : ObservableObject
     {
         _context.Students.Add(newStudent);
         await _context.SaveChangesAsync();
-        
+
         // Reload to get relationships populated
+        await LoadDataAsync();
+    }
+
+    public async System.Threading.Tasks.Task SaveChangesAsync()
+    {
+        var selectedId = SelectedStudent?.Id;
+        await _context.SaveChangesAsync();
+        await LoadDataAsync();
+        if (selectedId.HasValue)
+        {
+            SelectedStudent = Students.FirstOrDefault(s => s.Id == selectedId.Value);
+        }
+    }
+
+    public async System.Threading.Tasks.Task DeleteStudentAsync(Student student)
+    {
+        _context.Students.Remove(student);
+        await _context.SaveChangesAsync();
         await LoadDataAsync();
     }
 }
