@@ -1,0 +1,132 @@
+<UserControl
+    x:Class="IeltsTeachingAssistant.Controls.InteractiveRubricGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="RootControl">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" /> <!-- Band Column -->
+            <ColumnDefinition Width="*" /> <!-- Task Response -->
+            <ColumnDefinition Width="*" /> <!-- Coherence -->
+            <ColumnDefinition Width="*" /> <!-- Lexical -->
+            <ColumnDefinition Width="*" /> <!-- Grammar -->
+            <ColumnDefinition Width="200" /> <!-- Score Summary Sidebar -->
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Headers -->
+            <RowDefinition Height="Auto" /> <!-- Band 9 -->
+            <RowDefinition Height="Auto" /> <!-- Band 8 -->
+            <RowDefinition Height="Auto" /> <!-- Band 7 -->
+        </Grid.RowDefinitions>
+
+        <!-- Headers -->
+        <Border Grid.Row="0" Grid.Column="0" BorderThickness="0,0,0,2" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="8">
+            <TextBlock Text="BAND" FontWeight="Bold" VerticalAlignment="Center" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="1" BorderThickness="0,0,0,2" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="8">
+            <TextBlock Text="Task response" FontWeight="SemiBold" Foreground="{StaticResource FeedbackTaskColor}" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="2" BorderThickness="0,0,0,2" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="8">
+            <TextBlock Text="Coherence and cohesion" FontWeight="SemiBold" Foreground="{StaticResource FeedbackCoherenceColor}" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="3" BorderThickness="0,0,0,2" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="8">
+            <TextBlock Text="Lexical resource" FontWeight="SemiBold" Foreground="{StaticResource FeedbackVocabularyColor}" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="4" BorderThickness="0,0,0,2" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" Padding="8">
+            <TextBlock Text="Grammatical range" FontWeight="SemiBold" Foreground="{StaticResource FeedbackGrammarColor}" />
+        </Border>
+
+        <!-- Band 9 -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="9" FontSize="24" FontWeight="Bold" Foreground="{StaticResource ErrorColor}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="16" />
+        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Fully addresses all parts of the task" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Presents a fully developed position" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Cohesion is used in such a way that it attracts no attention" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Skillfully manages paragraphing" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="3" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a wide range of vocabulary with very natural and sophisticated control" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="4" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a wide range of structures with full flexibility and accuracy" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+
+        <!-- Band 8 -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="8" FontSize="24" FontWeight="Bold" Foreground="{StaticResource ErrorColor}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="16" />
+        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Sufficiently addresses all parts of the task" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Presents a well-developed response" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="2" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Sequences information and ideas logically" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Manages all aspects of cohesion well" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="3" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a wide vocabulary fluently and flexibly" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Produces rare errors in spelling" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="4" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a wide range of structures" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="The majority of sentences are error-free" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+
+        <!-- Band 7 -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="7" FontSize="24" FontWeight="Bold" Foreground="{StaticResource ErrorColor}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="16" />
+        <StackPanel Grid.Row="3" Grid.Column="1" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Addresses all parts of the task" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Presents a clear position throughout" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.Column="2" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Logically organises information and ideas" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Uses a range of cohesive devices appropriately" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.Column="3" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a sufficient range of vocabulary" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="May produce occasional errors in word choice" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+        <StackPanel Grid.Row="3" Grid.Column="4" Spacing="8" Padding="12" BorderThickness="0,0,1,1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+            <ToggleButton Content="Uses a variety of complex structures" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+            <ToggleButton Content="Has good control of grammar and punctuation" Style="{StaticResource OutlineTagButtonStyle}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" />
+        </StackPanel>
+
+        <!-- Summary Sidebar -->
+        <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="5" Margin="16,0,0,0" Padding="16" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="{StaticResource MediumCornerRadius}">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Calculated Band" FontWeight="SemiBold" />
+                
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Task Ach.:" Opacity="0.6"/>
+                    <TextBlock Text="{x:Bind TaskAchievement, Mode=OneWay}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Coh/Coh:" Opacity="0.6"/>
+                    <TextBlock Text="{x:Bind CoherenceCohesion, Mode=OneWay}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Lexical:" Opacity="0.6"/>
+                    <TextBlock Text="{x:Bind LexicalResource, Mode=OneWay}" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Grammar:" Opacity="0.6"/>
+                    <TextBlock Text="{x:Bind GrammaticalRange, Mode=OneWay}" FontWeight="Bold"/>
+                </StackPanel>
+
+                <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,8"/>
+                
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Overall:" Opacity="0.8" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind OverallBand, Mode=OneWay}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource SuccessColor}"/>
+                </StackPanel>
+
+                <Button Content="Clear selections" HorizontalAlignment="Stretch" Margin="0,16,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -7,8 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:IeltsTeachingAssistant.Models"
     xmlns:views="using:IeltsTeachingAssistant.Views"
+    xmlns:controls="using:IeltsTeachingAssistant.Controls"
     mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Disabled">
 
     <Page.Resources>
         <DataTemplate x:Key="WritingTaskTemplate" x:DataType="models:WritingTask">
@@ -137,6 +138,32 @@
                     </Border>
                 </Grid>
 
+                <!-- ══ Rubric Grid Panel ══════════════════════════════════════════════ -->
+                <!-- 4-column accordion: one per criterion, highlighting AI-matched band -->
+                <Border Style="{StaticResource CardOuterShellStyle}" Margin="0,8,0,0">
+                    <Border Style="{StaticResource PremiumCardStyle}" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="IELTS Band Rubric" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                       Opacity="0.8" />
+                            <controls:RubricGridPanel
+                                MatrixDescriptors="{Binding ElementName=RootPage, Path=ViewModel.MatrixDescriptors, Mode=OneWay}"
+                                Score0="{Binding TaskAchievement, Mode=OneWay}"
+                                Score1="{Binding CoherenceCohesion, Mode=OneWay}"
+                                Score2="{Binding LexicalResource, Mode=OneWay}"
+                                Score3="{Binding GrammaticalRange, Mode=OneWay}"
+                                Comment0="{Binding TaskAchievementAIComment, Mode=OneWay}"
+                                Comment1="{Binding CoherenceCohesionAIComment, Mode=OneWay}"
+                                Comment2="{Binding LexicalResourceAIComment, Mode=OneWay}"
+                                Comment3="{Binding GrammaticalRangeAIComment, Mode=OneWay}"
+                                HighlightedIds0="{Binding RubricHighlightIds0, Mode=OneWay}"
+                                HighlightedIds1="{Binding RubricHighlightIds1, Mode=OneWay}"
+                                HighlightedIds2="{Binding RubricHighlightIds2, Mode=OneWay}"
+                                HighlightedIds3="{Binding RubricHighlightIds3, Mode=OneWay}" />
+                        </StackPanel>
+                    </Border>
+                </Border>
+
                 <!-- Pedagogical Coaching suggestions card -->
                 <Border Style="{StaticResource CardOuterShellStyle}">
                     <Border Style="{StaticResource PremiumCardStyle}" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="16">
@@ -174,7 +201,7 @@
             <ToggleSwitch Header="Focus Mode" IsOn="{x:Bind ViewModel.IsFocusMode, Mode=TwoWay}" HorizontalAlignment="Right" />
         </Grid>
         
-        <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=OneWay}" 
+        <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=TwoWay}" 
                  Severity="{x:Bind ViewModel.InfoBarSeverity, Mode=OneWay}" 
                  Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
                  Margin="0,0,0,16"/>
@@ -264,6 +291,18 @@
                     </DataTemplate>
                 </Pivot.ItemTemplate>
             </Pivot>
+        </Grid>
+
+        <!-- Busy/Loading Overlay (Global Loader) -->
+        <Grid Grid.Row="0" Grid.RowSpan="5"
+              Background="#66000000"
+              Visibility="{x:Bind views:WritingEvaluationPage.LoaderVisibility(ViewModel.IsLoading), Mode=OneWay}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                <ProgressRing IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Width="50" Height="50" Foreground="White" />
+                <TextBlock Text="Evaluating with AI, please wait..." Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

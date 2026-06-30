@@ -1,37 +1,60 @@
-# Walkthrough: Database Schema, Saving Integrity, and Performance Dashboards
+﻿# AI-Assisted Grading Workflow — Implementation Walkthrough
 
-This document outlines the recent design updates, database schema fixes, and charting implementations built into the IELTS Teaching Assistant application.
-
-> [!IMPORTANT]
-> **Platform Target**: This project targets the **Windows x64 architecture only**. Building or running the application in `x86` is not supported.
-
----
-
-## 1. Database Schema and Saving Integrity
-- **Dynamic SQLite Migrator**: Added an automatic SQLite dynamic table column migrator inside `InitializeDatabase()` in `App.xaml.cs`. It runs `ALTER TABLE ... ADD COLUMN ...` dynamically on application startup to merge new properties (like the `Prompt` column on `WritingTasks`) without losing existing database entries.
-- **Save Session Tracking Fix**: Refactored `SaveSessionAsync()` in speaking and writing ViewModels to use `EntityState.Unchanged` for related navigation models. This stops the Entity Framework change tracker from corrupting foreign key relations during subsequent saves and prevents page locking.
+> **Build status**: SUCCESS (0 errors, 12 pre-existing warnings)
+> **Test status**: 97/97 tests passing (integration + adversarial)
+> **Target**: Windows x64, WinUI 3, .NET 8
 
 ---
 
-## 2. Performance Dashboards for Students and Classes
+## Overview
 
-We designed and built premium performance dashboards using CommunityToolkit MVVM, WinUI 3, and LiveChartsCore.
-
-### Key Visual & Design Features
-1. **Dynamic Progress Tracking (x64 Only)**:
-   - **Student Dashboard**: Shows an interactive line chart tracking progression of Overall Band, Speaking Band, and Writing Band over time.
-   - **Class Dashboard**: Displays a student band score distribution bar chart alongside a class overall average progression line chart.
-2. **Criteria Breakdown**:
-   - Clean, color-coded visual progress indicators for IELTS criteria (Speaking: Fluency & Coherence, Lexical, Grammar, Pronunciation; Writing: Task Achievement, Coherence & Cohesion, Lexical, Grammar).
-3. **Master-Detail Evaluation History**:
-   - Provides a comprehensive sidebar of historical tests for the selected student.
-   - Clicking an evaluation reveals detailed feedback inline: prompt, transcripts, band scores, and separate sections for **AI Feedback** and **Teacher Feedback** comments.
-4. **Student Performance Matrix**:
-   - Tabular grid on the Class dashboard highlighting student averages, status badges (e.g. Target Reached / On Track), and direct quick-navigation action buttons.
+Teachers can now input a student's work, have it automatically graded by Vertex AI, review and adjust results in the marking grid, generate per-criterion AI comments, and save the full session to the SQLite database.
 
 ---
 
-## 3. Build & Type Resolution Errors Resolved
-1. **Missing Namespace Mapping**: Added missing `xmlns:views="using:IeltsTeachingAssistant.Views"` namespace imports in the XAML files to resolve calls to static layout visibility helper functions.
-2. **Invalid Axis Binding Types**: Solved a WinUI-specific XAML compiler constraint where assigning `Axis[]` directly to `IEnumerable<ICartesianAxis>` triggered compiler error `WMC1121`. Properties on the ViewModels were updated to `IEnumerable<ICartesianAxis>` initialized with covariant `ICartesianAxis[]` arrays.
-3. **Hex Color-String Binding Compatibility**: Created a static helper method `ConvertHexToBrush` in `ClassPerformancePage.xaml.cs` to dynamically map status color hex codes to WinUI `Brush` objects in `x:Bind` expressions.
+## End-to-End Workflow
+
+1. Teacher enters Prompt + pastes/uploads Student Work
+2. GradeWithAiAsync calls IVertexAIService
+3. Band scores, AI comments, matched descriptor IDs auto-populated
+4. LoadDescriptorsFromTask auto-selects rubric items in marking grid
+5. Teacher manually adjusts any selections/scores
+6. GoToNext shows per-criterion AI comments screen
+7. SaveSessionAsync persists to SQLite via EF Core
+8. ClearSession resets student fields, retains Prompt and skill
+
+---
+
+## Key Files Modified
+
+- WritingEvaluationViewModel.cs: GradeWithAiAsync, LoadDescriptorsFromTask, SaveSessionAsync, ClearSession, concurrency hardening
+- SpeakingEvaluationViewModel.cs: Same pattern for speaking + audio recording fixes
+- WritingEvaluationPage.xaml/.cs: Input fields, file upload picker, loader overlay, unsaved-changes guard
+- SpeakingEvaluationPage.xaml/.cs: Speaking-specific UI with audio controls
+
+---
+
+## Adversarial Hardening (9 Patches)
+
+1. Unique audio recording paths (timestamp + GUID)
+2. AI backup clearing on student change
+3. Weighted overall band for partial tasks
+4. DbContext scope safe disposal after IsLoading=false
+5. SemaphoreSlim(1,1) preventing concurrent saves
+6. IsGrading reset in finally block
+7. IsPlaying reset on natural MediaEnded
+8. Interlocked ref-count for concurrent loader tasks
+9. Dynamic progress indicator bound to IsLoading
+
+---
+
+## Build Command
+
+dotnet build src\IeltsTeachingAssistant\IeltsTeachingAssistant.csproj --configuration Release -p:Platform=x64
+
+---
+
+## Test Command
+
+dotnet run --project scratch\TestGrading\TestGrading.csproj
+# Expected: 97 passed, 0 failed

@@ -8,14 +8,30 @@ namespace IeltsTeachingAssistant.Views;
 
 public sealed partial class WritingEvaluationPage : Page
 {
+    private readonly IServiceScope _scope;
     public WritingEvaluationViewModel ViewModel { get; }
 
     public WritingEvaluationPage()
     {
+        _scope = App.Services.CreateScope();
+        ViewModel = _scope.ServiceProvider.GetRequiredService<WritingEvaluationViewModel>();
         this.InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<WritingEvaluationViewModel>();
         DataContext = ViewModel;
+        this.Unloaded += async (s, e) =>
+        {
+            try
+            {
+                while (ViewModel.IsLoading)
+                {
+                    await Task.Delay(50);
+                }
+            }
+            catch { }
+            _scope.Dispose();
+        };
     }
+
+    public static Visibility LoaderVisibility(bool isLoading) => isLoading ? Visibility.Visible : Visibility.Collapsed;
 
     protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {

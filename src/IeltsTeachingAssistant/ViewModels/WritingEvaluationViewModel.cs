@@ -1,216 +1,297 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using IeltsTeachingAssistant.Models;
-using IeltsTeachingAssistant.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Xml.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IeltsTeachingAssistant.Data;
-using Microsoft.EntityFrameworkCore;
+using IeltsTeachingAssistant.Models;
+using IeltsTeachingAssistant.Services;
 
 namespace IeltsTeachingAssistant.ViewModels;
 
 public partial class WritingEvaluationViewModel : ObservableObject
 {
-    private readonly IVertexAIService _vertexAiService;
+    private readonly IVertexAIService _vertexAIService;
     private readonly IEvaluationService _evaluationService;
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _dbContext;
+    private readonly Dictionary<int, (double TR, double CC, double LR, double GRA)> _writingAiBackups = new();
 
-    [ObservableProperty]
-    private WritingEvaluation _evaluation;
+    private readonly System.Threading.SemaphoreSlim _saveSemaphore = new(1, 1);
+    private int _loadingRefCount;
 
-    [ObservableProperty]
-    private Student? _selectedStudent;
+    private void IncrementLoading()
+    {
+        System.Threading.Interlocked.Increment(ref _loadingRefCount);
+        IsLoading = true;
+    }
+
+    private void DecrementLoading()
+    {
+        if (System.Threading.Interlocked.Decrement(ref _loadingRefCount) <= 0)
+        {
+            _loadingRefCount = 0;
+            IsLoading = false;
+        }
+    }
+
+    partial void OnSelectedStudentChanged(Student? value)
+    {
+        _writingAiBackups.Clear();
+        if (value != null)
+        {
+            WritingTasks.Clear();
+            WritingTasks.Add(new WritingTask { TaskNumber = 1, TaskType = "Academic" });
+            WritingTasks.Add(new WritingTask { TaskNumber = 2, TaskType = "Academic" });
+            SelectedTask = WritingTasks.FirstOrDefault();
+        }
+    }
 
     [ObservableProperty]
     private ObservableCollection<Student> _students = new();
 
     [ObservableProperty]
-    private int _activePivotIndex = 0;
+    private Student? _selectedStudent;
 
-    public List<string> EvaluationModes { get; } = new()
-    {
-        "Full Test (Tasks 1 & 2)",
-        "Task 1 Only",
-        "Task 2 Only"
-    };
+    public string[] EvaluationModes { get; } = new[] { "Standard AI", "Detailed Feedback", "Exam Mode" };
 
     [ObservableProperty]
-    private string _selectedEvaluationMode = "Full Test (Tasks 1 & 2)";
+    private string _selectedEvaluationMode = "Standard AI";
 
-    partial void OnSelectedEvaluationModeChanged(string value)
+    [ObservableProperty]
+    private ObservableCollection<WritingTask> _writingTasks = new();
+
+    [ObservableProperty]
+    private List<MatrixCriterion> _matrixDescriptors = new();
+
+    [ObservableProperty]
+    private WritingTask? _selectedTask;
+
+    [ObservableProperty]
+    private bool _isLoading;
+
+    [ObservableProperty]
+    private string? _errorMessage;
+
+    [ObservableProperty]
+    private bool _isDirty;
+
+    public WritingEvaluationViewModel(
+        IVertexAIService vertexAIService,
+        IEvaluationService evaluationService,
+        AppDbContext dbContext)
     {
-        UpdateEvaluationTasks();
+        _vertexAIService = vertexAIService ?? throw new ArgumentNullException(nameof(vertexAIService));
+        _evaluationService = evaluationService ?? throw new ArgumentNullException(nameof(evaluationService));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+
+        InitializeMatrixDescriptors();
+        LoadStudents();
+        ClearSession();
     }
 
-    private void UpdateEvaluationTasks()
+    public void LoadStudents()
     {
-        var student = SelectedStudent;
-        var newEval = new WritingEvaluation
+        Students.Clear();
+        foreach (var student in _dbContext.Students.ToList())
         {
-            Student = student,
-            StudentId = student?.Id ?? 0,
-            EvaluationMode = SelectedEvaluationMode
-        };
-
-        if (SelectedEvaluationMode == "Full Test (Tasks 1 & 2)")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
+            Students.Add(student);
         }
-        else if (SelectedEvaluationMode == "Task 1 Only")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
-        }
-        else if (SelectedEvaluationMode == "Task 2 Only")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
-        }
-
-        Evaluation = newEval;
-        ActivePivotIndex = 0;
-        UpdateAverages();
     }
 
-    partial void OnSelectedStudentChanged(Student? oldValue, Student? newValue)
+    private void InitializeMatrixDescriptors()
     {
-        ClearSessionInternal(newValue);
-    }
-
-    private bool _isFocusMode = false;
-    public bool IsFocusMode
-    {
-        get => _isFocusMode;
-        set
+        MatrixDescriptors = IeltsDescriptors.WritingDescriptors.Select(cd => new MatrixCriterion
         {
-            if (SetProperty(ref _isFocusMode, value))
+            CriterionKey = cd.CriterionKey,
+            CriterionName = cd.CriterionName,
+            Bands = cd.Bands.Select(bd => new MatrixBand
             {
-                OnPropertyChanged(nameof(SimultaneousModeVisibility));
-                OnPropertyChanged(nameof(FocusModeVisibility));
+                Band = bd.Band,
+                Points = bd.Points.Select(pd =>
+                {
+                    var point = new MatrixPoint
+                    {
+                        Id = pd.Id,
+                        Text = pd.Text,
+                        IsSelected = false
+                    };
+                    point.PropertyChanged += Point_PropertyChanged;
+                    return point;
+                }).ToList()
+            }).ToList()
+        }).ToList();
+    }
+
+    private void Point_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MatrixPoint.IsSelected) && sender is MatrixPoint changedPoint)
+        {
+            IsDirty = true;
+            if (changedPoint.IsSelected)
+            {
+                foreach (var criterion in MatrixDescriptors)
+                {
+                    var bandWithPoint = criterion.Bands.FirstOrDefault(b => b.Points.Any(p => p.Id == changedPoint.Id));
+                    if (bandWithPoint != null)
+                    {
+                        // Deselect other points in the same criterion
+                        foreach (var b in criterion.Bands)
+                        {
+                            foreach (var p in b.Points)
+                            {
+                                if (p != changedPoint)
+                                {
+                                    p.PropertyChanged -= Point_PropertyChanged;
+                                    p.IsSelected = false;
+                                    p.PropertyChanged += Point_PropertyChanged;
+                                }
+                            }
+                        }
+
+                        // Update individual band score on the active WritingTask
+                        if (SelectedTask != null)
+                        {
+                            UpdateTaskScore(SelectedTask, criterion.CriterionKey, bandWithPoint.Band);
+                            OnPropertyChanged(nameof(SelectedTask));
+                        }
+                        break;
+                    }
+                }
             }
         }
     }
 
-    public Microsoft.UI.Xaml.Visibility SimultaneousModeVisibility => _isFocusMode ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
-    public Microsoft.UI.Xaml.Visibility FocusModeVisibility => _isFocusMode ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
-
-    public WritingEvaluationViewModel(
-        IVertexAIService vertexAiService,
-        IEvaluationService evaluationService,
-        AppDbContext context)
+    private void UpdateTaskScore(WritingTask task, string key, double score)
     {
-        _vertexAiService = vertexAiService;
-        _evaluationService = evaluationService;
-        _context = context;
-
-        _evaluation = new WritingEvaluation { EvaluationMode = SelectedEvaluationMode };
-        _evaluation.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = _evaluation });
-        _evaluation.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = _evaluation });
-    }
-
-    private void ClearSessionInternal(Student? student)
-    {
-        var newEval = new WritingEvaluation
+        switch (key)
         {
-            Student = student,
-            StudentId = student?.Id ?? 0,
-            EvaluationMode = SelectedEvaluationMode
-        };
-
-        if (SelectedEvaluationMode == "Full Test (Tasks 1 & 2)")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
-        }
-        else if (SelectedEvaluationMode == "Task 1 Only")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 1, Evaluation = newEval });
-        }
-        else if (SelectedEvaluationMode == "Task 2 Only")
-        {
-            newEval.Tasks.Add(new WritingTask { TaskNumber = 2, Evaluation = newEval });
-        }
-
-        Evaluation = newEval;
-        ActivePivotIndex = 0;
-        IsErrorVisible = false;
-        ErrorMessage = string.Empty;
-        HasUnsavedChanges = false;
-    }
-
-    [RelayCommand]
-    public void ClearSession()
-    {
-        SelectedStudent = null;
-        ClearSessionInternal(null);
-    }
-
-    public async Task InitializeAsync()
-    {
-        Students.Clear();
-        var students = await _context.Students.ToListAsync();
-        foreach (var s in students)
-        {
-            Students.Add(s);
+            case "TR":
+                task.TaskAchievement = score;
+                break;
+            case "CC":
+                task.CoherenceCohesion = score;
+                break;
+            case "LR":
+                task.LexicalResource = score;
+                break;
+            case "GRA":
+                task.GrammaticalRange = score;
+                break;
         }
     }
 
-    [ObservableProperty]
-    private string _errorMessage = string.Empty;
+    public void LoadDescriptorsFromTask(WritingTask task)
+    {
+        if (task == null || string.IsNullOrEmpty(IeltsTeachingAssistant.Models.SelectedRubricDescriptorsExtensions.GetSelectedRubricDescriptors(task))) return;
+        try
+        {
+            var ids = JsonSerializer.Deserialize<List<string>>(IeltsTeachingAssistant.Models.SelectedRubricDescriptorsExtensions.GetSelectedRubricDescriptors(task));
+            if (ids != null)
+            {
+                foreach (var criterion in MatrixDescriptors)
+                {
+                    foreach (var band in criterion.Bands)
+                    {
+                        foreach (var point in band.Points)
+                        {
+                            point.PropertyChanged -= Point_PropertyChanged;
+                            point.IsSelected = ids.Contains(point.Id);
+                            point.PropertyChanged += Point_PropertyChanged;
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
+        BuildRubricHighlights(task);
+    }
 
-    [ObservableProperty]
-    private bool _isErrorVisible = false;
-
-    [ObservableProperty]
-    private Microsoft.UI.Xaml.Controls.InfoBarSeverity _infoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-
-    [ObservableProperty]
-    private bool _isGrading = false;
-
-    [ObservableProperty]
-    private bool _hasUnsavedChanges = false;
-
-    [RelayCommand]
-    private async Task GradeWithAiAsync(WritingTask task)
+    /// <summary>
+    /// Populates the per-criterion <see cref="WritingTask.RubricHighlightIds0"/> –
+    /// <see cref="WritingTask.RubricHighlightIds3"/> properties from the AI-matched
+    /// descriptor IDs stored on the task. Called after AI grading and after manual
+    /// descriptor load so the <see cref="Controls.RubricGridPanel"/> always reflects
+    /// the current state.
+    /// </summary>
+    public void BuildRubricHighlights(WritingTask task)
     {
         if (task == null) return;
 
-        IsErrorVisible = false;
-        ErrorMessage = string.Empty;
-        IsGrading = true;
-        InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
+        var raw = IeltsTeachingAssistant.Models.SelectedRubricDescriptorsExtensions.GetSelectedRubricDescriptors(task);
+        List<string>? allIds = null;
+        if (!string.IsNullOrEmpty(raw))
+        {
+            try { allIds = JsonSerializer.Deserialize<List<string>>(raw); } catch { }
+        }
+        allIds ??= new List<string>();
 
+        var descriptors = IeltsDescriptors.WritingDescriptors;
+        var highlightProps = new System.Action<IReadOnlyList<string>?>[]{
+            v => task.RubricHighlightIds0 = v,
+            v => task.RubricHighlightIds1 = v,
+            v => task.RubricHighlightIds2 = v,
+            v => task.RubricHighlightIds3 = v,
+        };
+
+        for (int i = 0; i < descriptors.Count && i < highlightProps.Length; i++)
+        {
+            var criterion = descriptors[i];
+            var criterionIds = new List<string>();
+            foreach (var band in criterion.Bands)
+                foreach (var point in band.Points)
+                    if (allIds.Contains(point.Id))
+                        criterionIds.Add(point.Id);
+            highlightProps[i](criterionIds.Count > 0 ? criterionIds : null);
+        }
+    }
+
+    [RelayCommand]
+    public async Task GradeWithAiAsync(WritingTask task)
+    {
+        IncrementLoading();
+        ErrorMessage = null;
+        IsErrorVisible = false;
         try
         {
-            var taskTypeStr = task.TaskNumber == 1 ? (task.TaskType ?? "Graph") : "Essay";
+            if (task == null) throw new ArgumentNullException(nameof(task));
+            if (string.IsNullOrWhiteSpace(task.Prompt) || string.IsNullOrWhiteSpace(task.SubmissionText))
+            {
+                throw new ArgumentException("Prompt and submission text cannot be empty.");
+            }
 
-            var result = await _vertexAiService.GradeWritingAsync(task.Prompt ?? "", task.SubmissionText ?? "", task.TaskNumber, "Academic", taskTypeStr);
+            var result = await _vertexAIService.GradeWritingAsync(
+                task.Prompt,
+                task.SubmissionText,
+                task.TaskNumber,
+                SelectedEvaluationMode,
+                task.TaskType ?? "Academic"
+            );
 
             task.TaskAchievement = result.AnalyticalCriteriaScores.TaskResponse.Band;
+            task.CoherenceCohesion = result.AnalyticalCriteriaScores.CoherenceCohesion.Band;
+            task.LexicalResource = result.AnalyticalCriteriaScores.LexicalResource.Band;
+            task.GrammaticalRange = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.Band;
+
             task.TaskAchievementAIComment = result.AnalyticalCriteriaScores.TaskResponse.KeyJustification;
+            task.CoherenceCohesionAIComment = result.AnalyticalCriteriaScores.CoherenceCohesion.KeyJustification;
+            task.LexicalResourceAIComment = result.AnalyticalCriteriaScores.LexicalResource.KeyJustification;
+            task.GrammaticalRangeAIComment = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.KeyJustification;
+
             task.TaskAchievementJustification = result.AnalyticalCriteriaScores.TaskResponse.KeyJustification;
             task.TaskAchievementEvidence = string.Join("; ", result.AnalyticalCriteriaScores.TaskResponse.SupportingEvidenceQuotes);
             task.TaskAchievementLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.TaskResponse.LimitingFactors);
 
-            task.CoherenceCohesion = result.AnalyticalCriteriaScores.CoherenceCohesion.Band;
-            task.CoherenceCohesionAIComment = result.AnalyticalCriteriaScores.CoherenceCohesion.KeyJustification;
             task.CoherenceCohesionJustification = result.AnalyticalCriteriaScores.CoherenceCohesion.KeyJustification;
             task.CoherenceCohesionEvidence = string.Join("; ", result.AnalyticalCriteriaScores.CoherenceCohesion.SupportingEvidenceQuotes);
             task.CoherenceCohesionLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.CoherenceCohesion.LimitingFactors);
 
-            task.LexicalResource = result.AnalyticalCriteriaScores.LexicalResource.Band;
-            task.LexicalResourceAIComment = result.AnalyticalCriteriaScores.LexicalResource.KeyJustification;
             task.LexicalResourceJustification = result.AnalyticalCriteriaScores.LexicalResource.KeyJustification;
             task.LexicalResourceEvidence = string.Join("; ", result.AnalyticalCriteriaScores.LexicalResource.SupportingEvidenceQuotes);
             task.LexicalResourceLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.LexicalResource.LimitingFactors);
 
-            task.GrammaticalRange = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.Band;
-            task.GrammaticalRangeAIComment = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.KeyJustification;
             task.GrammaticalRangeJustification = result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.KeyJustification;
             task.GrammaticalRangeEvidence = string.Join("; ", result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.SupportingEvidenceQuotes);
             task.GrammaticalRangeLimitingFactors = string.Join("; ", result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.LimitingFactors);
@@ -219,33 +300,208 @@ public partial class WritingEvaluationViewModel : ObservableObject
             task.PrimaryWeakness = result.StudentCoaching.PrimaryWeaknessToFix;
             task.ActionablePractice = result.StudentCoaching.ActionablePracticeExercise;
 
-            UpdateAverages();
-            await SaveSessionAsync();
+            var allMatchedIds = new List<string>();
+            allMatchedIds.AddRange(result.AnalyticalCriteriaScores.TaskResponse.MatchedDescriptorIds);
+            allMatchedIds.AddRange(result.AnalyticalCriteriaScores.CoherenceCohesion.MatchedDescriptorIds);
+            allMatchedIds.AddRange(result.AnalyticalCriteriaScores.LexicalResource.MatchedDescriptorIds);
+            allMatchedIds.AddRange(result.AnalyticalCriteriaScores.GrammaticalRangeAccuracy.MatchedDescriptorIds);
+
+            IeltsTeachingAssistant.Models.SelectedRubricDescriptorsExtensions.SetSelectedRubricDescriptors(task, JsonSerializer.Serialize(allMatchedIds));
+            
+            // Backup the AI scores
+            _writingAiBackups[task.TaskNumber] = (
+                task.TaskAchievement,
+                task.CoherenceCohesion,
+                task.LexicalResource,
+                task.GrammaticalRange
+            );
+
+            LoadDescriptorsFromTask(task);
+            IsDirty = true;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ErrorMessage = ex.Message;
             IsErrorVisible = true;
         }
         finally
         {
-            IsGrading = false;
+            DecrementLoading();
         }
     }
 
-    public double EvaluationOverallBand => Evaluation?.OverallBand ?? 0.0;
-    public double EvaluationTaskAchievement => Evaluation?.TaskAchievement ?? 0.0;
-    public double EvaluationCoherenceCohesion => Evaluation?.CoherenceCohesion ?? 0.0;
-    public double EvaluationLexicalResource => Evaluation?.LexicalResource ?? 0.0;
-    public double EvaluationGrammaticalRange => Evaluation?.GrammaticalRange ?? 0.0;
-
-    partial void OnEvaluationChanged(WritingEvaluation value)
+    public void RevertToAiScore(WritingTask task)
     {
-        UpdateAverages();
+        if (task == null) return;
+        if (_writingAiBackups.TryGetValue(task.TaskNumber, out var scores))
+        {
+            task.TaskAchievement = scores.TR;
+            task.CoherenceCohesion = scores.CC;
+            task.LexicalResource = scores.LR;
+            task.GrammaticalRange = scores.GRA;
+            
+            LoadDescriptorsFromTask(task);
+            IsDirty = true;
+        }
     }
+
+    public string? CheckForConflicts(WritingTask task)
+    {
+        if (task == null) return null;
+        if (_writingAiBackups.TryGetValue(task.TaskNumber, out var scores))
+        {
+            if (Math.Abs(task.TaskAchievement - scores.TR) >= 2.0 ||
+                Math.Abs(task.CoherenceCohesion - scores.CC) >= 2.0 ||
+                Math.Abs(task.LexicalResource - scores.LR) >= 2.0 ||
+                Math.Abs(task.GrammaticalRange - scores.GRA) >= 2.0)
+            {
+                return "Conflict detected: manual score differs from AI score by >= 2.0 bands.";
+            }
+        }
+        return null;
+    }
+
+    [RelayCommand]
+    public async Task SaveSessionAsync()
+    {
+        if (!_saveSemaphore.Wait(0))
+        {
+            return;
+        }
+        IncrementLoading();
+        ErrorMessage = null;
+        IsErrorVisible = false;
+        try
+        {
+            if (SelectedStudent == null)
+            {
+                throw new InvalidOperationException("No student selected.");
+            }
+            var eval = new WritingEvaluation
+            {
+                StudentId = SelectedStudent.Id,
+                ClassId = SelectedStudent.ClassId,
+                EvaluationMode = SelectedEvaluationMode,
+                TestType = TestType.Academic,
+                EvaluatedAt = DateTime.UtcNow
+            };
+            foreach (var task in WritingTasks)
+            {
+                eval.Tasks.Add(task);
+            }
+            await _evaluationService.CreateWritingEvaluationAsync(eval);
+            IsDirty = false;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            IsErrorVisible = true;
+        }
+        finally
+        {
+            DecrementLoading();
+            _saveSemaphore.Release();
+        }
+    }
+
+    [RelayCommand]
+    public void ClearSession()
+    {
+        SelectedStudent = null;
+        SelectedEvaluationMode = "Standard AI";
+        WritingTasks.Clear();
+        WritingTasks.Add(new WritingTask { TaskNumber = 1, TaskType = "Academic" });
+        WritingTasks.Add(new WritingTask { TaskNumber = 2, TaskType = "Academic" });
+        SelectedTask = WritingTasks.FirstOrDefault();
+
+        foreach (var criterion in MatrixDescriptors)
+        {
+            foreach (var band in criterion.Bands)
+            {
+                foreach (var point in band.Points)
+                {
+                    point.PropertyChanged -= Point_PropertyChanged;
+                    point.IsSelected = false;
+                    point.PropertyChanged += Point_PropertyChanged;
+                }
+            }
+        }
+        _writingAiBackups.Clear();
+        IsDirty = false;
+        ErrorMessage = null;
+    }
+
+    [RelayCommand]
+    public void GoToNext()
+    {
+        if (WritingTasks.Count == 0) return;
+        if (SelectedTask == null)
+        {
+            SelectedTask = WritingTasks.FirstOrDefault();
+        }
+        else
+        {
+            int index = WritingTasks.IndexOf(SelectedTask);
+            if (index >= 0 && index < WritingTasks.Count - 1)
+            {
+                SelectedTask = WritingTasks[index + 1];
+            }
+        }
+    }
+
+    public bool CheckDirtyWarning()
+    {
+        return IsDirty;
+    }
+
+    [ObservableProperty]
+    private bool _isFocusMode;
+
+    [ObservableProperty]
+    private int _activePivotIndex;
+
+    [ObservableProperty]
+    private bool _isErrorVisible;
+
+    [ObservableProperty]
+    private Microsoft.UI.Xaml.Controls.InfoBarSeverity _infoBarSeverity;
+
+    public Microsoft.UI.Xaml.Visibility SimultaneousModeVisibility => IsFocusMode ? Microsoft.UI.Xaml.Visibility.Collapsed : Microsoft.UI.Xaml.Visibility.Visible;
+    public Microsoft.UI.Xaml.Visibility FocusModeVisibility => IsFocusMode ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+    partial void OnIsFocusModeChanged(bool value)
+    {
+        OnPropertyChanged(nameof(SimultaneousModeVisibility));
+        OnPropertyChanged(nameof(FocusModeVisibility));
+    }
+
+    public bool HasUnsavedChanges
+    {
+        get => IsDirty;
+        set => IsDirty = value;
+    }
+
+    private WritingEvaluation _evaluation = new();
+    public WritingEvaluation Evaluation 
+    {
+        get
+        {
+            _evaluation.Tasks = WritingTasks;
+            return _evaluation;
+        }
+    }
+
+    public double EvaluationOverallBand => Evaluation.OverallBand;
+    public double EvaluationTaskAchievement => Evaluation.TaskAchievement;
+    public double EvaluationCoherenceCohesion => Evaluation.CoherenceCohesion;
+    public double EvaluationLexicalResource => Evaluation.LexicalResource;
+    public double EvaluationGrammaticalRange => Evaluation.GrammaticalRange;
+
+    public Task InitializeAsync() => Task.CompletedTask;
 
     public void UpdateAverages()
     {
+        OnPropertyChanged(nameof(Evaluation));
         OnPropertyChanged(nameof(EvaluationOverallBand));
         OnPropertyChanged(nameof(EvaluationTaskAchievement));
         OnPropertyChanged(nameof(EvaluationCoherenceCohesion));
@@ -253,182 +509,63 @@ public partial class WritingEvaluationViewModel : ObservableObject
         OnPropertyChanged(nameof(EvaluationGrammaticalRange));
     }
 
-    [RelayCommand]
-    public async Task GoToNextAsync()
-    {
-        if (IsFocusMode)
-        {
-            if (ActivePivotIndex == 0 && Evaluation.Tasks.Count > 1)
-            {
-                var task2 = Evaluation.Tasks.FirstOrDefault(t => t.TaskNumber == 2);
-                if (task2 != null)
-                {
-                    task2.SubmissionText = string.Empty;
-                }
-                ActivePivotIndex = 1;
-            }
-            else
-            {
-                await SaveSessionAndSelectNextStudentAsync();
-            }
-        }
-        else
-        {
-            await SaveSessionAndSelectNextStudentAsync();
-        }
-    }
-
-    private async Task SaveSessionAndSelectNextStudentAsync()
-    {
-        if (Evaluation.Student != null && HasUnsavedChanges)
-        {
-            await SaveSessionAsync();
-        }
-
-        if (SelectedStudent != null && Students.Count > 1)
-        {
-            var currentIndex = Students.IndexOf(SelectedStudent);
-            var nextIndex = (currentIndex + 1) % Students.Count;
-            var nextStudent = Students[nextIndex];
-
-            var oldPrompts = Evaluation.Tasks.ToDictionary(t => t.TaskNumber, t => (t.Prompt, t.TaskType));
-
-            SelectedStudent = nextStudent;
-
-            foreach (var task in Evaluation.Tasks)
-            {
-                if (oldPrompts.TryGetValue(task.TaskNumber, out var value))
-                {
-                    task.Prompt = value.Prompt;
-                    task.TaskType = value.TaskType;
-                }
-            }
-
-            ActivePivotIndex = 0;
-
-            ErrorMessage = $"Switched to student: {nextStudent.Name}. Work fields cleared, prompts preserved.";
-            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Informational;
-            IsErrorVisible = true;
-        }
-        else
-        {
-            ErrorMessage = "All students completed or only one student available.";
-            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Informational;
-            IsErrorVisible = true;
-        }
-    }
-
     public async Task LoadDocumentContentAsync(WritingTask task, string filePath)
     {
         if (task == null || string.IsNullOrEmpty(filePath)) return;
-
-        IsErrorVisible = false;
-        ErrorMessage = string.Empty;
-        IsGrading = true;
-
         try
         {
-            string ext = Path.GetExtension(filePath).ToLower();
-            string content = "";
+            if (filePath.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
+            {
+                using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read))
+                using (var archive = new System.IO.Compression.ZipArchive(fileStream))
+                {
+                    var entry = archive.GetEntry("word/document.xml");
+                    if (entry == null)
+                    {
+                        throw new System.IO.InvalidDataException("Invalid Word document: main content (word/document.xml) is missing.");
+                    }
+                    using (var entryStream = entry.Open())
+                    {
+                        var doc = System.Xml.Linq.XDocument.Load(entryStream);
+                        var w = (System.Xml.Linq.XNamespace)"http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+                        var paragraphs = doc.Descendants(w + "p");
+                        var paragraphTexts = new List<string>();
+                        foreach (var p in paragraphs)
+                        {
+                            var pText = string.Concat(p.Descendants().Select(el => {
+                                if (el.Name == w + "t") return el.Value;
+                                if (el.Name == w + "br") return Environment.NewLine;
+                                if (el.Name == w + "tab") return "\t";
+                                return "";
+                            }));
+                            if (!string.IsNullOrEmpty(pText))
+                            {
+                                paragraphTexts.Add(pText);
+                            }
+                        }
+                        task.SubmissionText = string.Join(Environment.NewLine, paragraphTexts);
+                    }
+                }
+                task.OriginalFilePath = filePath;
+                return;
+            }
 
-            if (ext == ".txt")
+            if (filePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {
-                content = await File.ReadAllTextAsync(filePath);
-            }
-            else if (ext == ".docx")
-            {
-                content = ExtractTextFromDocx(filePath);
-            }
-            else if (ext == ".pdf" || ext == ".png" || ext == ".jpg" || ext == ".jpeg")
-            {
-                content = await _vertexAiService.ExtractTextFromPdfOrImageAsync(filePath);
+                task.SubmissionText = await System.IO.File.ReadAllTextAsync(filePath);
             }
             else
             {
-                throw new NotSupportedException("Unsupported file type. Please upload a TXT, DOCX, PDF, or image file.");
+                task.SubmissionText = await _vertexAIService.ExtractTextFromPdfOrImageAsync(filePath);
             }
-
-            task.SubmissionText = content;
-            HasUnsavedChanges = true;
+            task.OriginalFilePath = filePath;
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Failed to load document: {ex.Message}";
+            IsErrorVisible = true;
             InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error;
-            IsErrorVisible = true;
-        }
-        finally
-        {
-            IsGrading = false;
-        }
-    }
-
-    private string ExtractTextFromDocx(string filePath)
-    {
-        using var fileStream = File.OpenRead(filePath);
-        using var archive = new ZipArchive(fileStream);
-        var entry = archive.GetEntry("word/document.xml");
-        if (entry == null) return string.Empty;
-
-        using var entryStream = entry.Open();
-        var doc = XDocument.Load(entryStream);
-
-        XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-
-        var paragraphs = doc.Descendants(w + "p")
-            .Select(p => string.Join("", p.Descendants(w + "t").Select(t => t.Value)));
-
-        return string.Join(Environment.NewLine, paragraphs);
-    }
-
-    [RelayCommand]
-    public async Task SaveSessionAsync()
-    {
-        if (Evaluation.Student == null)
-        {
-            ErrorMessage = "Please select a student before saving.";
-            IsErrorVisible = true;
-            return;
-        }
-
-        try
-        {
-            Evaluation.ClassId = Evaluation.Student.ClassId;
-            Evaluation.StudentId = Evaluation.Student.Id;
-            Evaluation.EvaluationMode = SelectedEvaluationMode;
-
-            _context.Entry(Evaluation.Student).State = EntityState.Unchanged;
-            if (Evaluation.Class != null)
-            {
-                _context.Entry(Evaluation.Class).State = EntityState.Unchanged;
-            }
-
-            if (Evaluation.Id == 0)
-            {
-                _context.WritingEvaluations.Add(Evaluation);
-            }
-            else
-            {
-                var entry = _context.Entry(Evaluation);
-                if (entry.State == EntityState.Detached)
-                {
-                    _context.WritingEvaluations.Update(Evaluation);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-
-            HasUnsavedChanges = false;
-            ErrorMessage = "Session saved successfully!";
-            InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success;
-            IsErrorVisible = true;
-        }
-        catch (System.Exception ex)
-        {
-            var msg = ex.Message;
-            if (ex.InnerException != null) msg += "\nInner: " + ex.InnerException.Message;
-            ErrorMessage = $"Failed to save: {msg}";
-            IsErrorVisible = true;
         }
     }
 }
+

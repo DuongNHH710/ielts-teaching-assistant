@@ -23,7 +23,24 @@ public sealed partial class ClassPerformancePage : Page
         base.OnNavigatedTo(e);
         if (e.Parameter is int classId)
         {
-            await ViewModel.InitializeAsync(classId);
+            try
+            {
+                await ViewModel.InitializeAsync(classId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ClassPerformancePage] Navigation crashed: {ex}");
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Failed to load class dashboard",
+                    Content = $"An error occurred while loading the class data:\n{ex.Message}",
+                    CloseButtonText = "Go Back",
+                    XamlRoot = this.XamlRoot,
+                    DefaultButton = ContentDialogButton.Close
+                };
+                await errorDialog.ShowAsync();
+                if (Frame.CanGoBack) Frame.GoBack();
+            }
         }
     }
 

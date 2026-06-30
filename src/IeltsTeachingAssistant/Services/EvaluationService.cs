@@ -85,20 +85,22 @@ public class EvaluationService : IEvaluationService
         if (hasSpeaking)
         {
             var speakingQuery = _context.SpeakingEvaluations.AsNoTracking().Where(e => e.StudentId == studentId);
-            metrics.AverageSpeakingBand = await speakingQuery.AverageAsync(s => s.OverallBand);
-            metrics.SpeakingFluency = await speakingQuery.AverageAsync(s => s.FluencyCoherence);
-            metrics.SpeakingLexical = await speakingQuery.AverageAsync(s => s.LexicalResource);
-            metrics.SpeakingGrammar = await speakingQuery.AverageAsync(s => s.GrammaticalRange);
-            metrics.SpeakingPronunciation = await speakingQuery.AverageAsync(s => s.Pronunciation);
-            metrics.SpeakingTrend = await speakingQuery.OrderBy(s => s.EvaluatedAt).Select(s => s.OverallBand).ToListAsync();
+            var speakingList = await speakingQuery.Include(e => e.Parts).ToListAsync();
+            metrics.AverageSpeakingBand = speakingList.Any() ? speakingList.Average(s => s.OverallBand) : 0;
+            metrics.SpeakingFluency = speakingList.Any() ? speakingList.Average(s => s.FluencyCoherence) : 0;
+            metrics.SpeakingLexical = speakingList.Any() ? speakingList.Average(s => s.LexicalResource) : 0;
+            metrics.SpeakingGrammar = speakingList.Any() ? speakingList.Average(s => s.GrammaticalRange) : 0;
+            metrics.SpeakingPronunciation = speakingList.Any() ? speakingList.Average(s => s.Pronunciation) : 0;
+            metrics.SpeakingTrend = speakingList.OrderBy(s => s.EvaluatedAt).Select(s => s.OverallBand).ToList();
         }
 
         var hasWriting = await _context.WritingEvaluations.AnyAsync(e => e.StudentId == studentId);
         if (hasWriting)
         {
             var writingQuery = _context.WritingEvaluations.AsNoTracking().Where(e => e.StudentId == studentId);
-            metrics.AverageWritingBand = await writingQuery.AverageAsync(w => w.OverallBand);
-            metrics.WritingTrend = await writingQuery.OrderBy(w => w.EvaluatedAt).Select(w => w.OverallBand).ToListAsync();
+            var writingList = await writingQuery.Include(e => e.Tasks).ToListAsync();
+            metrics.AverageWritingBand = writingList.Any() ? writingList.Average(w => w.OverallBand) : 0;
+            metrics.WritingTrend = writingList.OrderBy(w => w.EvaluatedAt).Select(w => w.OverallBand).ToList();
         }
 
         var hasReading = await _context.ReadingEvaluations.AnyAsync(e => e.StudentId == studentId);

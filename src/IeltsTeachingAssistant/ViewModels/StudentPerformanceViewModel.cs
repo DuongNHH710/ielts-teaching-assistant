@@ -125,6 +125,12 @@ public partial class StudentPerformanceViewModel : ObservableObject
     [ObservableProperty]
     private string _goalPredictionColor = string.Empty;
 
+    [ObservableProperty]
+    private string? _errorMessage;
+
+    [ObservableProperty]
+    private bool _isErrorVisible;
+
     public StudentPerformanceViewModel(AppDbContext context)
     {
         _context = context;
@@ -132,6 +138,8 @@ public partial class StudentPerformanceViewModel : ObservableObject
 
     public async Task InitializeAsync(int studentId)
     {
+        ErrorMessage = null;
+        IsErrorVisible = false;
         IsLoading = true;
         Evaluations.Clear();
 
@@ -366,8 +374,54 @@ public partial class StudentPerformanceViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    public async Task DeleteEvaluationAsync(EvaluationHistoryItem item)
+    {
+        if (item == null || Student == null) return;
+
+        try
+        {
+            // Remove from the correct table based on type
+            switch (item.Type)
+            {
+                case "Speaking":
+                    var sp = await _context.SpeakingEvaluations.FindAsync(item.Id);
+                    if (sp != null) _context.SpeakingEvaluations.Remove(sp);
+                    break;
+                case "Writing":
+                    var wr = await _context.WritingEvaluations.FindAsync(item.Id);
+                    if (wr != null) _context.WritingEvaluations.Remove(wr);
+                    break;
+                case "Reading":
+                    var rd = await _context.ReadingEvaluations.FindAsync(item.Id);
+                    if (rd != null) _context.ReadingEvaluations.Remove(rd);
+                    break;
+                case "Listening":
+                    var ls = await _context.ListeningEvaluations.FindAsync(item.Id);
+                    if (ls != null) _context.ListeningEvaluations.Remove(ls);
+                    break;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Clear selection if the deleted item was selected
+            if (SelectedEvaluation == item)
+                SelectedEvaluation = null;
+
+            // Refresh the full view to update averages and chart
+            await InitializeAsync(Student.Id);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error deleting evaluation: {ex.Message}";
+            IsErrorVisible = true;
+            System.Diagnostics.Debug.WriteLine($"Error deleting evaluation: {ex}");
+        }
+    }
+
     private void RenderChart(Student student)
     {
+
         var speakingPoints = student.SpeakingEvaluations
             .OrderBy(e => e.EvaluatedAt)
             .Select(e => new { Date = e.EvaluatedAt, Band = e.OverallBand })

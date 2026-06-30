@@ -34,35 +34,41 @@ public sealed partial class DashboardPage : Page
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        await ViewModel.LoadDashboardDataAsync();
+        try
+        {
+            await ViewModel.LoadDashboardDataAsync();
 
-        // Update stats
-        TotalStudentsText.Text = ViewModel.TotalStudents.ToString();
-        ActiveClassesText.Text = ViewModel.ActiveClasses.ToString();
-        MonthlyEvalsText.Text = ViewModel.MonthlyEvaluations.ToString();
-        AvgBandText.Text = ViewModel.AverageBand > 0
-            ? ViewModel.AverageBand.ToString("F1")
-            : "—";
+            TotalStudentsText.Text = ViewModel.TotalStudents.ToString();
+            ActiveClassesText.Text = ViewModel.ActiveClasses.ToString();
+            MonthlyEvalsText.Text = ViewModel.MonthlyEvaluations.ToString();
+            AvgBandText.Text = ViewModel.AverageBand > 0
+                ? ViewModel.AverageBand.ToString("F1")
+                : "\u2014";
 
-        // Show/hide empty state
-        EmptyStatePanel.Visibility = ViewModel.RecentEvaluations.Count == 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        RecentActivityList.Visibility = ViewModel.RecentEvaluations.Count > 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+            EmptyStatePanel.Visibility = ViewModel.RecentEvaluations.Count == 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            RecentActivityList.Visibility = ViewModel.RecentEvaluations.Count > 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[DashboardPage] Load failed: {ex}");
+            // Non-fatal — dashboard degrades gracefully, stats stay at zero
+        }
     }
 
     private void NewSpeakingEval_Click(object sender, RoutedEventArgs e)
     {
         var mainWindow = App.MainWindowInstance;
-        mainWindow.NavigateTo(typeof(SpeakingEvaluationPage));
+        mainWindow.NavigateTo(typeof(EvaluationsPage));
     }
 
     private void NewWritingEval_Click(object sender, RoutedEventArgs e)
     {
         var mainWindow = App.MainWindowInstance;
-        mainWindow.NavigateTo(typeof(WritingEvaluationPage));
+        mainWindow.NavigateTo(typeof(EvaluationsPage));
     }
 
     private void AddClass_Click(object sender, RoutedEventArgs e)

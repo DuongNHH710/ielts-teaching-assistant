@@ -17,7 +17,7 @@ namespace IeltsTeachingAssistant.ViewModels;
 /// </summary>
 public partial class DashboardViewModel : ObservableObject
 {
-    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
     [ObservableProperty]
     private int _totalStudents;
@@ -49,9 +49,9 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private IEnumerable<ICartesianAxis> _yAxes = Array.Empty<ICartesianAxis>();
 
-    public DashboardViewModel(AppDbContext context)
+    public DashboardViewModel(IDbContextFactory<AppDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     /// <summary>
@@ -61,6 +61,7 @@ public partial class DashboardViewModel : ObservableObject
     {
         try
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
             TotalStudents = await _context.Students.CountAsync();
 
             ActiveClasses = await _context.Classes
@@ -212,7 +213,7 @@ public partial class DashboardViewModel : ObservableObject
             };
 
             // Load recent evaluations
-            await LoadRecentEvaluationsAsync();
+            await LoadRecentEvaluationsAsync(_context);
         }
         catch (Exception ex)
         {
@@ -225,7 +226,7 @@ public partial class DashboardViewModel : ObservableObject
     /// <summary>
     /// Loads the 10 most recent evaluations (Speaking, Writing, Reading, and Listening).
     /// </summary>
-    private async Task LoadRecentEvaluationsAsync()
+    private async Task LoadRecentEvaluationsAsync(AppDbContext _context)
     {
         RecentEvaluations.Clear();
 

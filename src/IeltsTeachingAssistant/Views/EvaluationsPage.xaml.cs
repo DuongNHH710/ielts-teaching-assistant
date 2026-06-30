@@ -1,75 +1,52 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace IeltsTeachingAssistant.Views;
-
-public sealed partial class EvaluationsPage : Page
+namespace IeltsTeachingAssistant.Views
 {
-    public EvaluationsPage()
+    public sealed partial class EvaluationsPage : Page
     {
-        this.InitializeComponent();
-    }
-
-    protected override void OnNavigatedTo(NavigationEventArgs e)
-    {
-        base.OnNavigatedTo(e);
-
-        if (e.Parameter is string tabName)
+        public EvaluationsPage()
         {
-            switch (tabName.ToLower())
+            this.InitializeComponent();
+        }
+
+        private void EvalPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (EvalPivot == null) return;
+
+            switch (EvalPivot.SelectedIndex)
             {
-                case "reading":
-                    EvalPivot.SelectedIndex = 0;
+                case 0:
+                    if (ReadingFrame.Content == null)
+                    {
+                        ReadingFrame.Navigate(typeof(ReadingEvaluationPage));
+                    }
                     break;
-                case "listening":
-                    EvalPivot.SelectedIndex = 1;
+                case 1:
+                    if (ListeningFrame.Content == null)
+                    {
+                        ListeningFrame.Navigate(typeof(ListeningEvaluationPage));
+                    }
                     break;
-                case "writing":
-                    EvalPivot.SelectedIndex = 2;
+                case 2:
+                    if (WritingFrame.Content == null)
+                    {
+                        WritingFrame.Navigate(typeof(WritingEvaluationPage));
+                    }
                     break;
-                case "speaking":
-                    EvalPivot.SelectedIndex = 3;
+                case 3:
+                    if (SpeakingFrame.Content == null)
+                    {
+                        SpeakingFrame.Navigate(typeof(SpeakingEvaluationPage));
+                    }
                     break;
             }
         }
 
-        // Trigger loading the initial selected tab
-        LoadTab(EvalPivot.SelectedIndex);
-    }
-
-    private void EvalPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        LoadTab(EvalPivot.SelectedIndex);
-    }
-
-    private void LoadTab(int index)
-    {
-        switch (index)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            case 0:
-                if (ReadingFrame.Content == null)
-                {
-                    ReadingFrame.Navigate(typeof(ReadingEvaluationPage));
-                }
-                break;
-            case 1:
-                if (ListeningFrame.Content == null)
-                {
-                    ListeningFrame.Navigate(typeof(ListeningEvaluationPage));
-                }
-                break;
-            case 2:
-                if (WritingFrame.Content == null)
-                {
-                    WritingFrame.Navigate(typeof(WritingEvaluationPage));
-                }
-                break;
-            case 3:
-                if (SpeakingFrame.Content == null)
-                {
-                    SpeakingFrame.Navigate(typeof(SpeakingEvaluationPage));
-                }
-                break;
+            base.OnNavigatedTo(e);
+            EvalPivot_SelectionChanged(EvalPivot, null!);
         }
     }
 }

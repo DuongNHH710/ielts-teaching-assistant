@@ -46,6 +46,9 @@ public class CriterionDetail
 
     [JsonPropertyName("limiting_factors")]
     public List<string> LimitingFactors { get; set; } = new();
+
+    [JsonPropertyName("matched_descriptor_ids")]
+    public List<string> MatchedDescriptorIds { get; set; } = new();
 }
 
 public class StudentCoaching

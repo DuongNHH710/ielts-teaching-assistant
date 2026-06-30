@@ -4,18 +4,22 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Extensions.DependencyInjection;
 using IeltsTeachingAssistant.ViewModels;
 using System;
+using System.Linq;
 
 namespace IeltsTeachingAssistant.Views;
 
 public sealed partial class StudentPerformancePage : Page
 {
+    private readonly IServiceScope _scope;
     public StudentPerformanceViewModel ViewModel { get; }
 
     public StudentPerformancePage()
     {
-        ViewModel = App.Services.GetRequiredService<StudentPerformanceViewModel>();
+        _scope = App.Services.CreateScope();
+        ViewModel = _scope.ServiceProvider.GetRequiredService<StudentPerformanceViewModel>();
         this.InitializeComponent();
         DataContext = ViewModel;
+        this.Unloaded += (s, e) => _scope.Dispose();
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -75,5 +79,29 @@ public sealed partial class StudentPerformancePage : Page
         }
 
         return new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Gray);
+    }
+
+    private async void DeleteEvaluation_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn || btn.Tag is not int evalId) return;
+
+        var item = ViewModel.Evaluations.FirstOrDefault(ev => ev.Id == evalId);
+        if (item == null) return;
+
+        var dialog = new ContentDialog
+        {
+            Title = "Delete Evaluation",
+            Content = $"Are you sure you want to permanently delete this {item.Type} evaluation from {item.DateString}? This cannot be undone.",
+            PrimaryButtonText = "Delete",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = this.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            await ViewModel.DeleteEvaluationAsync(item);
+        }
     }
 }

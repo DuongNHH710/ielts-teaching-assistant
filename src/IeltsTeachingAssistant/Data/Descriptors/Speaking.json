@@ -1,0 +1,343 @@
+{
+  "Criteria": ["Fluency and coherence", "Lexical resource", "Grammatical range and accuracy", "Pronunciation"],
+  "Bands": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+  "Cells": [
+    {
+      "Band": 9,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<positive>Fluent</positive> with only very occasional repetition or self-correction.",
+        "Any hesitation that occurs is used only to prepare the content of the next utterance and <positive>not to find words</positive> or grammar.",
+        "Speech is <positive>situationally appropriate</positive> and cohesive features are <positive>fully acceptable</positive>.",
+        "Topic development is <positive>fully coherent</positive> and appropriately extended."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "<positive>Total flexibility</positive> and precise use in all contexts.",
+        "<positive>Sustained use</positive> of accurate and idiomatic language."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "Structures are <positive>precise and accurate</positive> at all times, apart from ‘mistakes’ characteristic of native speaker speech."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Uses a <positive>full range</positive> of phonological features to convey precise and/or subtle meaning.",
+        "<positive>Flexible use</positive> of features of connected speech is sustained throughout.",
+        "Can be <positive>effortlessly understood</positive> throughout.",
+        "Accent has <positive>no effect</positive> on intelligibility."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<positive>Fluent</positive> with only very occasional repetition or self-correction.",
+        "Hesitation may occasionally be used to find words or grammar, but <positive>most will be content related</positive>.",
+        "Topic development is <positive>coherent, appropriate and relevant</positive>."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "<positive>Wide resource</positive>, readily and flexibly used to discuss all topics and convey precise meaning.",
+        "<positive>Skilful use</positive> of less common and idiomatic items despite occasional <limitation>inaccuracies</limitation> in word choice and collocation.",
+        "<positive>Effective use</positive> of paraphrase as required."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "<positive>Wide range</positive> of structures, flexibly used.",
+        "The majority of sentences are <positive>error free</positive>.",
+        "Occasional <limitation>inappropriacies</limitation> and non-systematic errors occur. A few basic errors may persist."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Uses a <positive>wide range</positive> of phonological features to convey precise and/or subtle meaning.",
+        "Can <positive>sustain appropriate rhythm</positive>. Flexible use of stress and intonation across long utterances, despite occasional <limitation>lapses</limitation>.",
+        "Can be <positive>easily understood</positive> throughout.",
+        "Accent has <positive>minimal effect</positive> on intelligibility."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<positive>Able to keep going</positive> and readily produce long turns without noticeable effort.",
+        "Some hesitation, repetition and/or self-correction may occur, often mid-sentence and indicate problems with accessing appropriate language. However, these will <positive>not affect coherence</positive>.",
+        "<positive>Flexible use</positive> of spoken discourse markers, connectives and cohesive features."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "Resource <positive>flexibly used</positive> to discuss a variety of topics.",
+        "<positive>Some ability</positive> to use less common and idiomatic items and an awareness of style and collocation is evident though <limitation>inappropriacies</limitation> occur.",
+        "<positive>Effective use</positive> of paraphrase as required."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "A <positive>range</positive> of structures flexibly used. <positive>Error-free</positive> sentences are frequent.",
+        "Both simple and complex sentences are used <positive>effectively</positive> despite some errors. A few basic errors persist."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "<positive>Displays all the positive features of band 6</positive>, and some, but not all, of the positive features of band 8."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<positive>Able to keep going</positive> and demonstrates a willingness to produce long turns.",
+        "Coherence may be <limitation>lost at times</limitation> as a result of hesitation, repetition and/or self-correction.",
+        "Uses a <positive>range</positive> of spoken discourse markers, connectives and cohesive features though <limitation>not always appropriately</limitation>."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "Resource <positive>sufficient</positive> to discuss topics at length.",
+        "Vocabulary use may be <limitation>inappropriate</limitation> but meaning is <positive>clear</positive>.",
+        "<positive>Generally able</positive> to paraphrase successfully."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "Produces a <positive>mix</positive> of short and complex sentence forms and a variety of structures with <limitation>limited flexibility</limitation>.",
+        "Though <limitation>errors frequently occur</limitation> in complex structures, these <positive>rarely impede</positive> communication."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Uses a <positive>range</positive> of phonological features, but control is <limitation>variable</limitation>.",
+        "Chunking is <positive>generally appropriate</positive>, but rhythm may be <limitation>affected by a lack of stress-timing</limitation> and/or a rapid speech rate.",
+        "Some <positive>effective use</positive> of intonation and stress, but this is <limitation>not sustained</limitation>.",
+        "Individual words or phonemes may be <limitation>mispronounced</limitation> but this causes only <limitation>occasional lack of clarity</limitation>.",
+        "Can <positive>generally be understood</positive> throughout without much effort."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<positive>Usually able</positive> to keep going, but <limitation>relies on repetition</limitation> and self-correction to do so and/or on <limitation>slow speech</limitation>.",
+        "Hesitations are often associated with mid-sentence searches for <limitation>fairly basic</limitation> lexis and grammar.",
+        "<limitation>Overuse</limitation> of certain discourse markers, connectives and other cohesive features.",
+        "More complex speech usually causes <limitation>disfluency</limitation> but simpler language may be produced fluently."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "Resource <positive>sufficient</positive> to discuss familiar and unfamiliar topics but there is <limitation>limited flexibility</limitation>.",
+        "Attempts paraphrase but <limitation>not always</limitation> with success."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "Basic sentence forms are <positive>fairly well controlled</positive> for accuracy.",
+        "Complex structures are attempted but these are <limitation>limited in range</limitation>, nearly always contain <limitation>errors</limitation> and may lead to the need for reformulation."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "<positive>Displays all the positive features of band 4</positive>, and some, but not all, of the positive features of band 6."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<limitation>Unable to keep going</limitation> without noticeable pauses.",
+        "Speech may be <limitation>slow</limitation> with <limitation>frequent repetition</limitation>.",
+        "Often <limitation>self-corrects</limitation>.",
+        "Can link simple sentences but often with <limitation>repetitious use</limitation> of connectives.",
+        "Some <limitation>breakdowns</limitation> in coherence."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "Resource <limitation>sufficient for familiar topics</limitation> but only basic meaning can be conveyed on unfamiliar topics.",
+        "<limitation>Frequent inappropriacies</limitation> and errors in word choice.",
+        "<limitation>Rarely attempts</limitation> paraphrase."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "Can produce basic sentence forms and some short utterances are <positive>error-free</positive>.",
+        "Subordinate clauses are <limitation>rare</limitation> and, overall, turns are <limitation>short</limitation>, structures are <limitation>repetitive</limitation> and errors are <limitation>frequent</limitation>."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Uses some <positive>acceptable</positive> phonological features, but the range is <limitation>limited</limitation>.",
+        "Produces some <positive>acceptable chunking</positive>, but there are <limitation>frequent lapses</limitation> in overall rhythm.",
+        "Attempts to use intonation and stress, but control is <limitation>limited</limitation>.",
+        "Individual words or phonemes are <limitation>frequently mispronounced</limitation>, causing <limitation>lack of clarity</limitation>.",
+        "Understanding <limitation>requires some effort</limitation> and there may be patches of speech that cannot be understood."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<limitation>Frequent</limitation>, sometimes long, pauses occur while candidate searches for words.",
+        "<limitation>Limited ability</limitation> to link simple sentences and go beyond simple responses to questions.",
+        "<limitation>Frequently unable</limitation> to convey basic message."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "Resource <limitation>limited to simple vocabulary</limitation> used primarily to convey personal information.",
+        "Vocabulary <limitation>inadequate</limitation> for unfamiliar topics."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "Basic sentence forms are attempted but grammatical <limitation>errors are numerous</limitation> except in apparently memorised utterances."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "<positive>Displays some features of band 2</positive>, and some, but not all, of the positive features of band 4."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<limitation>Lengthy pauses</limitation> before nearly every word.",
+        "Isolated words may be recognisable but speech is of <limitation>virtually no communicative significance</limitation>."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "<limitation>Very limited resource</limitation>. Utterances consist of isolated words or memorised utterances.",
+        "<limitation>Little communication possible</limitation> without the support of mime or gesture."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "<limitation>No evidence</limitation> of basic sentence forms."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Uses <limitation>few acceptable</limitation> phonological features (possibly because sample is insufficient).",
+        "Overall problems with delivery <limitation>impair</limitation> attempts at connected speech.",
+        "Individual words and phonemes are <limitation>mainly mispronounced</limitation> and <limitation>little meaning</limitation> is conveyed.",
+        "<limitation>Often unintelligible</limitation>."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<limitation>Essentially none</limitation>.",
+        "Speech is <limitation>totally incoherent</limitation>."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "<limitation>No resource</limitation> bar a few isolated words.",
+        "<limitation>No communication possible</limitation>."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "<limitation>No rateable language</limitation> unless memorised."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "Can produce <limitation>occasional individual words</limitation> and phonemes that are recognisable, but <limitation>no overall meaning</limitation> is conveyed.",
+        "<limitation>Unintelligible</limitation>."
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Fluency and coherence",
+      "Descriptors": [
+        "<limitation>Does not attend / Does not complete the test</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Lexical resource",
+      "Descriptors": [
+        "<limitation>Does not attend / Does not complete the test</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Grammatical range and accuracy",
+      "Descriptors": [
+        "<limitation>Does not attend / Does not complete the test</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Pronunciation",
+      "Descriptors": [
+        "<limitation>Does not attend / Does not complete the test</limitation>"
+      ]
+    }
+  ]
+}

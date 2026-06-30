@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Disabled">
 
     <ScrollViewer Padding="{StaticResource PagePadding}">
         <StackPanel Spacing="32" MaxWidth="800" HorizontalAlignment="Left">
@@ -16,17 +16,38 @@
                 <TextBlock Text="GOOGLE CLOUD" Style="{StaticResource OverlineStyle}" />
                 <Border Style="{StaticResource ElevatedCardStyle}">
                     <StackPanel Spacing="12">
-                        <TextBox Header="Project ID" />
-                        <TextBox Header="Region" />
+                        <TextBox x:Name="ProjectIdBox" Header="Project ID"
+                                 Text="{x:Bind ViewModel.GcpProjectId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox x:Name="RegionBox" Header="Region"
+                                 Text="{x:Bind ViewModel.GcpRegion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Header="Credentials File Path" IsReadOnly="True" />
-                            <Button Content="Browse" VerticalAlignment="Bottom" Grid.Column="1" />
+                            <TextBox x:Name="CredentialsPathBox"
+                                     Header="Credentials File Path (Optional — uses ADC if empty)"
+                                     IsReadOnly="True"
+                                     Text="{x:Bind ViewModel.GcpCredentialsPath, Mode=TwoWay}"
+                                     PlaceholderText="Using Application Default Credentials (ADC)" />
+                            <Button x:Name="BrowseCredentialsBtn" Content="Browse" VerticalAlignment="Bottom"
+                                    Grid.Column="1" Click="BrowseCredentials_Click" />
                         </Grid>
-                        <Button Content="Test Connection" HorizontalAlignment="Right" />
+                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                            <Button x:Name="SaveGcpBtn" Content="Save" Click="SaveGcpSettings_Click" />
+                            <Button x:Name="TestConnectionBtn" Content="Test Connection"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Click="TestConnection_Click"
+                                    IsEnabled="{x:Bind ViewModel.IsNotTesting, Mode=OneWay}" />
+                        </StackPanel>
+                        <ProgressBar x:Name="TestProgress" IsIndeterminate="True"
+                                     Visibility="{x:Bind ViewModel.TestingVisibility, Mode=OneWay}" />
+                        <InfoBar x:Name="ConnectionResult"
+                                 IsOpen="{x:Bind ViewModel.ConnectionResultVisible, Mode=OneWay}"
+                                 Severity="{x:Bind ViewModel.ConnectionResultSeverity, Mode=OneWay}"
+                                 Title="{x:Bind ViewModel.ConnectionResultTitle, Mode=OneWay}"
+                                 Message="{x:Bind ViewModel.ConnectionResultMessage, Mode=OneWay}"
+                                 IsClosable="True" />
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -35,7 +56,10 @@
             <StackPanel Spacing="16">
                 <TextBlock Text="AI MODEL" Style="{StaticResource OverlineStyle}" />
                 <Border Style="{StaticResource ElevatedCardStyle}">
-                    <ComboBox Header="Preferred Model" SelectedIndex="0" HorizontalAlignment="Stretch">
+                    <ComboBox x:Name="ModelCombo" Header="Preferred Model"
+                              SelectedIndex="{x:Bind ViewModel.PreferredModelIndex, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"
+                              SelectionChanged="ModelCombo_SelectionChanged">
                         <ComboBoxItem Content="Gemini 2.5 Flash" />
                         <ComboBoxItem Content="Gemini 2.5 Pro" />
                     </ComboBox>
@@ -46,9 +70,53 @@
             <StackPanel Spacing="16">
                 <TextBlock Text="SECURITY" Style="{StaticResource OverlineStyle}" />
                 <Border Style="{StaticResource ElevatedCardStyle}">
-                    <StackPanel Spacing="12">
-                        <Button Content="Change Master Password" />
+                    <StackPanel Spacing="16">
+                        <!-- Set Password (shown when no password is set) -->
+                        <StackPanel x:Name="SetPasswordPanel"
+                                    Spacing="12"
+                                    Visibility="{x:Bind ViewModel.SetPasswordVisibility, Mode=OneWay}">
+                            <TextBlock Text="No password is currently set." Opacity="0.7" />
+                            <PasswordBox x:Name="NewPasswordBox" Header="Set Admin Password"
+                                         PlaceholderText="Enter a new password"
+                                         PasswordChanged="Password_Changed" />
+                            <PasswordBox x:Name="ConfirmPasswordBox" Header="Confirm Password"
+                                         PlaceholderText="Re-enter your password"
+                                         PasswordChanged="Password_Changed" />
+                            <TextBlock x:Name="PasswordMismatchText" Text="Passwords do not match."
+                                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                       Visibility="Collapsed" />
+                            <Button x:Name="SetPasswordBtn" Content="Set Password"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    IsEnabled="False"
+                                    Click="SetPassword_Click" />
+                        </StackPanel>
+
+                        <!-- Change Password (shown when password exists) -->
+                        <StackPanel x:Name="ChangePasswordPanel"
+                                    Spacing="12"
+                                    Visibility="{x:Bind ViewModel.ChangePasswordVisibility, Mode=OneWay}">
+                            <Button x:Name="ChangePasswordBtn" Content="Change Master Password"
+                                    Click="ChangePassword_Click" />
+                        </StackPanel>
+
                         <ToggleSwitch Header="Enable Windows Hello / Biometrics" IsOn="False" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Data Management -->
+            <StackPanel Spacing="16">
+                <TextBlock Text="DATA MANAGEMENT" Style="{StaticResource OverlineStyle}" />
+                <Border Style="{StaticResource ElevatedCardStyle}">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Import Classes and Students" FontWeight="SemiBold" />
+                        <TextBlock Text="Download the template to format your data correctly, then import it into the application. The system supports bulk creation and updates of Classes and Students."
+                                   TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                            <Button Content="Download Template" Command="{x:Bind ViewModel.DownloadTemplateCommand}" />
+                            <Button Content="Import Data..." Style="{StaticResource AccentButtonStyle}"
+                                    Command="{x:Bind ViewModel.ImportDataCommand}" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </StackPanel>

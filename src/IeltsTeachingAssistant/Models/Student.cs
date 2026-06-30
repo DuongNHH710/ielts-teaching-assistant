@@ -26,11 +26,11 @@ public class Student
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    public double AverageReadingBand => ReadingEvaluations.Any() ? Math.Round(ReadingEvaluations.Average(e => e.BandScore) * 2) / 2.0 : 0;
-    public double AverageListeningBand => ListeningEvaluations.Any() ? Math.Round(ListeningEvaluations.Average(e => e.BandScore) * 2) / 2.0 : 0;
+    public double AverageReadingBand => ReadingEvaluations.Any() ? Helpers.BandScoreCalculator.RoundToHalfBand(ReadingEvaluations.Average(e => e.BandScore)) : 0;
+    public double AverageListeningBand => ListeningEvaluations.Any() ? Helpers.BandScoreCalculator.RoundToHalfBand(ListeningEvaluations.Average(e => e.BandScore)) : 0;
 
-    public double AverageSpeakingBand => SpeakingEvaluations.Any() ? Math.Round(SpeakingEvaluations.Average(e => e.OverallBand) * 2) / 2.0 : 0;
-    public double AverageWritingBand => WritingEvaluations.Any() ? Math.Round(WritingEvaluations.Average(e => e.OverallBand) * 2) / 2.0 : 0;
+    public double AverageSpeakingBand => SpeakingEvaluations.Any() ? Helpers.BandScoreCalculator.RoundToHalfBand(SpeakingEvaluations.Average(e => e.OverallBand)) : 0;
+    public double AverageWritingBand => WritingEvaluations.Any() ? Helpers.BandScoreCalculator.RoundToHalfBand(WritingEvaluations.Average(e => e.OverallBand)) : 0;
 
     public double OverallBand
     {
@@ -43,7 +43,7 @@ public class Student
             if (AverageListeningBand > 0) bands.Add(AverageListeningBand);
 
             if (bands.Count == 0) return 0;
-            return Math.Round(bands.Average() * 2) / 2.0;
+            return Helpers.BandScoreCalculator.RoundToHalfBand(bands.Average());
         }
     }
 

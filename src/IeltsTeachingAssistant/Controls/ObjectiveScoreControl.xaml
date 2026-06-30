@@ -1,0 +1,56 @@
+<UserControl
+    x:Class="IeltsTeachingAssistant.Controls.ObjectiveScoreControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:IeltsTeachingAssistant.ViewModels.Marking"
+    xmlns:helpers="using:IeltsTeachingAssistant.Helpers"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=vm:ObjectiveScoreViewModel}">
+
+    <UserControl.Resources>
+        <helpers:StringFormatConverter x:Key="StringFormatConverter" />
+    </UserControl.Resources>
+
+    <StackPanel Spacing="24" MaxWidth="400" HorizontalAlignment="Center" Margin="0,48,0,0">
+        
+        <TextBlock Text="Enter Raw Score" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" />
+        
+        <TextBlock Text="Enter the number of correct answers out of 40." 
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                   HorizontalAlignment="Center" 
+                   TextWrapping="WrapWholeWords" 
+                   TextAlignment="Center" />
+
+        <NumberBox Minimum="0" 
+                   Maximum="40" 
+                   Value="{Binding RawScore, Mode=TwoWay}" 
+                   SpinButtonPlacementMode="Inline"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Width="150" />
+
+        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="24"
+                Margin="0,24,0,0">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Calculated Band Score" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Text="{Binding CalculatedBand, Converter={StaticResource StringFormatConverter}, ConverterParameter='F1'}" 
+                           FontSize="64" 
+                           FontWeight="Bold" 
+                           Foreground="#FF0078D7" 
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding TrainingTypeDisplayText}" 
+                           FontSize="12" 
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
+</UserControl>

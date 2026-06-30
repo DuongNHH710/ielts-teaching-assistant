@@ -19,7 +19,7 @@ public class SpeakingEvaluation
     public TestType TestType { get; set; }
     public string? EvaluationMode { get; set; }
 
-    public double OverallBand => Parts.Any(p => p.FluencyCoherence > 0) ? Math.Round(Parts.Where(p => p.FluencyCoherence > 0).Average(p => (p.FluencyCoherence + p.LexicalResource + p.GrammaticalRange + p.Pronunciation) / 4.0) * 2) / 2.0 : 0;
+    public double OverallBand => Helpers.BandScoreCalculator.CalculateSpeakingOverall(FluencyCoherence, LexicalResource, GrammaticalRange, Pronunciation);
 
     public double FluencyCoherence => Parts.Any(p => p.FluencyCoherence > 0) ? Parts.Where(p => p.FluencyCoherence > 0).Average(p => p.FluencyCoherence) : 0;
     public double LexicalResource => Parts.Any(p => p.LexicalResource > 0) ? Parts.Where(p => p.LexicalResource > 0).Average(p => p.LexicalResource) : 0;

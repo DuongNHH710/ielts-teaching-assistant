@@ -17,7 +17,7 @@ namespace IeltsTeachingAssistant.ViewModels;
 
 public partial class ClassPerformanceViewModel : ObservableObject
 {
-    private readonly AppDbContext _context;
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ClassProgress))]
@@ -91,9 +91,9 @@ public partial class ClassPerformanceViewModel : ObservableObject
     [ObservableProperty]
     private string _syllabusWeekText = string.Empty;
 
-    public ClassPerformanceViewModel(AppDbContext context)
+    public ClassPerformanceViewModel(IDbContextFactory<AppDbContext> contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task InitializeAsync(int classId)
@@ -104,6 +104,8 @@ public partial class ClassPerformanceViewModel : ObservableObject
 
         try
         {
+            using var _context = await _contextFactory.CreateDbContextAsync();
+
             // Load class with students and their evaluations
             var classEntity = await _context.Classes
                 .Include(c => c.Students)
@@ -116,7 +118,11 @@ public partial class ClassPerformanceViewModel : ObservableObject
                     .ThenInclude(s => s.ListeningEvaluations)
                 .FirstOrDefaultAsync(c => c.Id == classId);
 
-            if (classEntity == null) return;
+            if (classEntity == null)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ClassPerformanceViewModel] Class {classId} not found.");
+                return; // finally block will still run and set IsLoading = false
+            }
 
             ClassEntity = classEntity;
             ClassName = classEntity.Name;

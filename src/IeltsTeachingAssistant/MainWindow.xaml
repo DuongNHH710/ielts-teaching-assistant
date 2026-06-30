@@ -5,62 +5,87 @@
     xmlns:local="using:IeltsTeachingAssistant"
     Title="IELTS Teaching Assistant">
 
-    <Grid>
-        <NavigationView
-            x:Name="NavView"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="True"
-            IsSettingsVisible="True"
-            PaneDisplayMode="Left"
-            OpenPaneLength="280"
-            SelectionChanged="NavView_SelectionChanged"
-            Loaded="NavView_Loaded">
+    <Grid RequestedTheme="Dark">
+        <Grid.Resources>
+            <Style x:Key="SidebarButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="CornerRadius" Value="100" />
+                <Setter Property="Width" Value="56" />
+                <Setter Property="Height" Value="56" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Style>
+        </Grid.Resources>
+        <!-- Custom Glassmorphism Gradient Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#020617" Offset="0.0" />
+                <GradientStop Color="#0F172A" Offset="0.5" />
+                <GradientStop Color="#1E293B" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
 
-            <!-- Navigation Header -->
-            <NavigationView.PaneHeader>
-                <StackPanel Orientation="Horizontal" Spacing="12" Padding="4,8,0,16">
-                    <FontIcon Glyph="&#xE82D;" FontSize="28" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                    <StackPanel VerticalAlignment="Center" Spacing="0">
-                        <TextBlock Text="IELTS Assistant"
-                                   FontSize="16" FontWeight="SemiBold"
-                                   CharacterSpacing="-20" />
-                        <TextBlock Text="Teaching Tools"
-                                   FontSize="11" Opacity="0.5"
-                                   CharacterSpacing="50" FontWeight="Medium" />
-                    </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Custom Floating Sidebar -->
+        <Border Grid.Column="0" 
+                Margin="24,48,12,24" 
+                CornerRadius="32" 
+                Width="88" 
+                Background="{StaticResource GlassSidebarBrush}"
+                BorderBrush="{StaticResource GlassBorderBrush}"
+                BorderThickness="1"
+                Padding="0,32,0,32">
+            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <!-- App Logo -->
+                <FontIcon Grid.Row="0" Glyph="&#xE82D;" FontSize="32" Foreground="#3B82F6" Margin="0,0,0,48" />
+
+                <!-- Navigation Items -->
+                <StackPanel Grid.Row="1" Spacing="16" HorizontalAlignment="Center">
+                    <Button x:Name="NavDashboard" Style="{StaticResource SidebarButtonStyle}" Tag="Dashboard" Click="SidebarButton_Click">
+                        <FontIcon Glyph="&#xE80F;" FontSize="20" />
+                    </Button>
+                    <Button x:Name="NavClasses" Style="{StaticResource SidebarButtonStyle}" Tag="Classes" Click="SidebarButton_Click">
+                        <FontIcon Glyph="&#xE902;" FontSize="20" />
+                    </Button>
+                    <Button x:Name="NavStudents" Style="{StaticResource SidebarButtonStyle}" Tag="Students" Click="SidebarButton_Click">
+                        <FontIcon Glyph="&#xE716;" FontSize="20" />
+                    </Button>
+                    <Button x:Name="NavMarking" Style="{StaticResource SidebarButtonStyle}" Tag="Marking" Click="SidebarButton_Click">
+                        <FontIcon Glyph="&#xE70F;" FontSize="20" />
+                    </Button>
                 </StackPanel>
-            </NavigationView.PaneHeader>
 
-            <!-- Navigation Menu Items -->
-            <NavigationView.MenuItems>
-                <NavigationViewItem x:Name="NavDashboard"
-                                     Content="Dashboard" Tag="Dashboard"
-                                     Icon="Home" />
+                <!-- Settings Item -->
+                <Button Grid.Row="2" x:Name="NavSettings" Style="{StaticResource SidebarButtonStyle}" Tag="Settings" Click="SidebarButton_Click" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE713;" FontSize="20" />
+                </Button>
+            </Grid>
+        </Border>
 
-                <NavigationViewItem x:Name="NavClasses"
-                                     Content="Classes" Tag="Classes">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE902;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItem x:Name="NavEvaluations"
-                                     Content="Evaluation Workspace" Tag="Evaluations">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xECAD;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItem x:Name="NavStudents"
-                                     Content="Student Profiles" Tag="Students">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE716;" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </NavigationView.MenuItems>
-
-            <!-- Content Frame -->
-            <Frame x:Name="ContentFrame" Padding="0">
+        <!-- Main Content Canvas -->
+        <Border Grid.Column="1" 
+                Margin="12,48,24,24" 
+                CornerRadius="32" 
+                Background="{StaticResource GlassAcrylicBrush}"
+                BorderBrush="{StaticResource GlassBorderBrush}"
+                BorderThickness="1"
+                Padding="0">
+            <Frame x:Name="ContentFrame">
                 <Frame.ContentTransitions>
                     <TransitionCollection>
                         <NavigationThemeTransition>
@@ -71,6 +96,6 @@
                     </TransitionCollection>
                 </Frame.ContentTransitions>
             </Frame>
-        </NavigationView>
+        </Border>
     </Grid>
 </Window>

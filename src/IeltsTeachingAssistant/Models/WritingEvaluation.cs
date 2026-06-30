@@ -26,8 +26,7 @@ public class WritingEvaluation
             if (!Tasks.Any()) return 0;
             var task1 = Tasks.FirstOrDefault(t => t.TaskNumber == 1)?.OverallBand ?? 0;
             var task2 = Tasks.FirstOrDefault(t => t.TaskNumber == 2)?.OverallBand ?? 0;
-            if (task1 > 0 && task2 > 0) return Helpers.BandScoreCalculator.CalculateWritingOverall(task1, task2);
-            return task1 > 0 ? task1 : task2;
+            return Helpers.BandScoreCalculator.CalculateWritingOverall(task1, task2);
         }
     }
 

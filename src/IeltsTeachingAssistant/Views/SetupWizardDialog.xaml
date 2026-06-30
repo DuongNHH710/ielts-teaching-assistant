@@ -32,9 +32,10 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="Vertex AI Credentials Path" FontWeight="SemiBold" />
+                <TextBlock Text="Vertex AI Credentials Path (Optional)" FontWeight="SemiBold" />
+                <TextBlock Text="Leave empty to use Application Default Credentials (ADC)." FontSize="12" Opacity="0.6" />
                 <Grid ColumnDefinitions="*,Auto">
-                    <TextBox x:Name="GcpCredentialsPathBox" Grid.Column="0" IsReadOnly="True" Margin="0,0,8,0" TextChanged="Field_Changed" />
+                    <TextBox x:Name="GcpCredentialsPathBox" Grid.Column="0" IsReadOnly="True" Margin="0,0,8,0" TextChanged="Field_Changed" PlaceholderText="Using ADC (gcloud auth application-default login)" />
                     <Button x:Name="BrowseCredentialsButton" Grid.Column="1" Content="Browse..." Click="BrowseCredentialsButton_Click" />
                 </Grid>
             </StackPanel>

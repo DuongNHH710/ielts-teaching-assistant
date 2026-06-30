@@ -9,6 +9,19 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
+            <FontFamily x:Key="OutfitFont">ms-appx:///Assets/Fonts/Outfit.ttf#Outfit</FontFamily>
+            <FontFamily x:Key="ContentControlThemeFontFamily">ms-appx:///Assets/Fonts/Outfit.ttf#Outfit</FontFamily>
+
+            <!-- ═══════════════════════════════════════════ -->
+            <!-- Glassmorphism Materials                     -->
+            <!-- ═══════════════════════════════════════════ -->
+            <AcrylicBrush x:Key="GlassAcrylicBrush"
+                          TintColor="#0F172A"
+                          TintOpacity="0.7"
+                          FallbackColor="#0F172A" />
+            <SolidColorBrush x:Key="GlassBorderBrush" Color="#1AFFFFFF" />
+            <SolidColorBrush x:Key="GlassSidebarBrush" Color="#40000000" />
+
             <!-- ═══════════════════════════════════════════ -->
             <!-- Premium Design System Tokens               -->
             <!-- ═══════════════════════════════════════════ -->
@@ -24,6 +37,28 @@
             <Color x:Key="WarningColor">#F59E0B</Color>
             <Color x:Key="ErrorColor">#F43F5E</Color>
             <Color x:Key="InfoColor">#3B82F6</Color>
+
+            <!-- Feedback Type Colors -->
+            <Color x:Key="FeedbackGrammarColor">#3B82F6</Color>
+            <Color x:Key="FeedbackVocabularyColor">#D97706</Color>
+            <Color x:Key="FeedbackSpellingColor">#B45309</Color>
+            <Color x:Key="FeedbackCoherenceColor">#8B5CF6</Color>
+            <Color x:Key="FeedbackTaskColor">#0D9488</Color>
+            <Color x:Key="FeedbackStyleColor">#4B5563</Color>
+            <Color x:Key="FeedbackIdeaColor">#D946EF</Color>
+
+            <SolidColorBrush x:Key="FeedbackGrammarBrush" Color="{StaticResource FeedbackGrammarColor}" />
+            <SolidColorBrush x:Key="FeedbackVocabularyBrush" Color="{StaticResource FeedbackVocabularyColor}" />
+            <SolidColorBrush x:Key="FeedbackSpellingBrush" Color="{StaticResource FeedbackSpellingColor}" />
+            <SolidColorBrush x:Key="FeedbackCoherenceBrush" Color="{StaticResource FeedbackCoherenceColor}" />
+            <SolidColorBrush x:Key="FeedbackTaskBrush" Color="{StaticResource FeedbackTaskColor}" />
+            <SolidColorBrush x:Key="FeedbackStyleBrush" Color="{StaticResource FeedbackStyleColor}" />
+            <SolidColorBrush x:Key="FeedbackIdeaBrush" Color="{StaticResource FeedbackIdeaColor}" />
+
+            <!-- Status Brushes -->
+            <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
+            <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+            <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
 
             <!-- Typography Scale -->
             <x:Double x:Key="DisplayFontSize">34</x:Double>
@@ -51,8 +86,8 @@
 
             <!-- Double-Bezel Card Style -->
             <Style x:Key="PremiumCardStyle" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{StaticResource GlassAcrylicBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="{StaticResource LargeCornerRadius}" />
                 <Setter Property="Padding" Value="{StaticResource CardPadding}" />
@@ -60,8 +95,8 @@
 
             <!-- Outer Shell for Double-Bezel Pattern -->
             <Style x:Key="CardOuterShellStyle" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{StaticResource GlassAcrylicBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="{StaticResource LargeCornerRadius}" />
                 <Setter Property="Padding" Value="4" />
@@ -69,8 +104,8 @@
 
             <!-- Elevated Card with Depth -->
             <Style x:Key="ElevatedCardStyle" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{StaticResource GlassAcrylicBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="{StaticResource MediumCornerRadius}" />
                 <Setter Property="Padding" Value="{StaticResource SmallCardPadding}" />
@@ -81,12 +116,35 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Stretch" />
                 <Setter Property="Padding" Value="20,16,20,16" />
-                <Setter Property="CornerRadius" Value="{StaticResource LargeCornerRadius}" />
+                <Setter Property="CornerRadius" Value="{StaticResource PillCornerRadius}" />
                 <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Background" Value="{StaticResource GlassAcrylicBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource GlassBorderBrush}" />
+            </Style>
+
+            <!-- Pill Toggle Button Style (for segmented controls like Editing/Suggesting) -->
+            <Style x:Key="PillToggleButtonStyle" TargetType="ToggleButton">
+                <Setter Property="CornerRadius" Value="{StaticResource PillCornerRadius}" />
+                <Setter Property="Padding" Value="20,8,20,8" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+            </Style>
+
+            <!-- Outline Tag Button Style -->
+            <Style x:Key="OutlineTagButtonStyle" TargetType="ToggleButton">
+                <Setter Property="CornerRadius" Value="{StaticResource SmallCornerRadius}" />
+                <Setter Property="Padding" Value="12,4,12,4" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Background" Value="Transparent" />
             </Style>
 
             <!-- Score Display Text Style -->
             <Style x:Key="BandScoreDisplayStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource OutfitFont}" />
                 <Setter Property="FontSize" Value="48" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="CharacterSpacing" Value="-50" />
@@ -94,6 +152,7 @@
 
             <!-- Page Title Style -->
             <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource OutfitFont}" />
                 <Setter Property="FontSize" Value="{StaticResource DisplayFontSize}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="CharacterSpacing" Value="-30" />
@@ -101,6 +160,7 @@
 
             <!-- Section Header Style -->
             <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource OutfitFont}" />
                 <Setter Property="FontSize" Value="{StaticResource TitleFontSize}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="CharacterSpacing" Value="-20" />
@@ -108,6 +168,7 @@
 
             <!-- Overline / Label Style -->
             <Style x:Key="OverlineStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource OutfitFont}" />
                 <Setter Property="FontSize" Value="{StaticResource OverlineFontSize}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="CharacterSpacing" Value="100" />

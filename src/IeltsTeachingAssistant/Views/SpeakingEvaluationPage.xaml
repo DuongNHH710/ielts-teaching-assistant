@@ -7,8 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:IeltsTeachingAssistant.Models"
     xmlns:views="using:IeltsTeachingAssistant.Views"
+    xmlns:controls="using:IeltsTeachingAssistant.Controls"
     mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Disabled">
 
     <Page.Resources>
         <DataTemplate x:Key="SpeakingPartTemplate" x:DataType="models:SpeakingPart">
@@ -122,27 +123,6 @@
                 
                 <TextBox Header="Transcript" Text="{Binding Transcript, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="100" />
                 
-                <Grid Margin="0,0,0,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
-                                Visibility="{x:Bind views:SpeakingEvaluationPage.GradingProgressVisibility(IsGrading), Mode=OneWay}">
-                        <ProgressRing IsActive="{x:Bind IsGrading, Mode=OneWay}" Width="16" Height="16" />
-                        <TextBlock Text="AI is grading..." FontWeight="Medium" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <Button Grid.Column="1" Content="Auto-Grade with AI" 
-                            Command="{Binding ElementName=RootPage, Path=ViewModel.GradeWithAiCommand}" 
-                            CommandParameter="{Binding}" 
-                            Style="{StaticResource AccentButtonStyle}"
-                            Height="40" Padding="24,0"
-                            IsEnabled="{x:Bind views:SpeakingEvaluationPage.CanGrade(IsGrading, IsTranscribing), Mode=OneWay}"
-                            HorizontalAlignment="Right" />
-                </Grid>
-
                 <!-- Criteria 2x2 Grid -->
                 <Grid ColumnSpacing="16" RowSpacing="16">
                     <Grid.ColumnDefinitions>
@@ -167,9 +147,6 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding FluencyCoherence, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding FluencyCoherence}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding FluencyCoherenceJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding FluencyCoherenceEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
-                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding FluencyCoherenceLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding FluencyCoherenceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -188,9 +165,6 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding LexicalResource, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding LexicalResource}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding LexicalResourceJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding LexicalResourceEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
-                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding LexicalResourceLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding LexicalResourceTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -209,9 +183,6 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding GrammaticalRange, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding GrammaticalRange}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding GrammaticalRangeJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding GrammaticalRangeEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
-                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding GrammaticalRangeLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding GrammaticalRangeTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
@@ -230,34 +201,38 @@
                                     <Slider Minimum="0" Maximum="9" StepFrequency="0.5" Value="{Binding Pronunciation, Mode=TwoWay}" TickFrequency="0.5" TickPlacement="Outside" ValueChanged="Slider_ValueChanged" />
                                     <TextBlock Grid.Column="1" Text="{Binding Pronunciation}" VerticalAlignment="Center" Margin="16,0,0,0" Width="30" />
                                 </Grid>
-                                <TextBox Header="AI Justification" IsReadOnly="True" Text="{Binding PronunciationJustification, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                                <TextBox Header="Supporting Evidence Quotes" IsReadOnly="True" Text="{Binding PronunciationEvidence, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="50" />
-                                <TextBox Header="Limiting Factors Capped Score" IsReadOnly="True" Text="{Binding PronunciationLimitingFactors, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="40" />
                                 <TextBox Header="Teacher Comment" Text="{Binding PronunciationTeacherComment, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" TextChanged="TeacherComment_TextChanged" />
                             </StackPanel>
                         </Border>
                     </Border>
                 </Grid>
 
-                <!-- Pedagogical Coaching suggestions card -->
-                <Border Style="{StaticResource CardOuterShellStyle}">
-                    <Border Style="{StaticResource PremiumCardStyle}" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Padding="16">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="AI Pedagogical Coaching &amp; Suggestions" FontSize="16" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            <TextBox Header="Core Strengths" IsReadOnly="True" Text="{Binding CoreStrengths, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                            <TextBox Header="Primary Weakness to Fix" IsReadOnly="True" Text="{Binding PrimaryWeakness, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
-                            <TextBox Header="Actionable Practice Exercise" IsReadOnly="True" Text="{Binding ActionablePractice, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="80" />
-                        </StackPanel>
-                    </Border>
-                </Border>
+                <!-- ══ Rubric Grid Panel (Expander) ═════════════════════════════════════ -->
+                <Expander Header="IELTS Band Rubric Details" IsExpanded="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,8,0,0">
+                    <controls:RubricGridPanel
+                        MatrixDescriptors="{Binding ElementName=RootPage, Path=ViewModel.MatrixDescriptors, Mode=OneWay}"
+                        Score0="{Binding FluencyCoherence, Mode=OneWay}"
+                        Score1="{Binding LexicalResource, Mode=OneWay}"
+                        Score2="{Binding GrammaticalRange, Mode=OneWay}"
+                        Score3="{Binding Pronunciation, Mode=OneWay}"
+                        Comment0="{Binding FluencyCoherenceAIComment, Mode=OneWay}"
+                        Comment1="{Binding LexicalResourceAIComment, Mode=OneWay}"
+                        Comment2="{Binding GrammaticalRangeAIComment, Mode=OneWay}"
+                        Comment3="{Binding PronunciationAIComment, Mode=OneWay}"
+                        HighlightedIds0="{Binding RubricHighlightIds0, Mode=OneWay}"
+                        HighlightedIds1="{Binding RubricHighlightIds1, Mode=OneWay}"
+                        HighlightedIds2="{Binding RubricHighlightIds2, Mode=OneWay}"
+                        HighlightedIds3="{Binding RubricHighlightIds3, Mode=OneWay}" />
+                </Expander>
 
-                <!-- Next button to clear field and transition -->
-                <Button Command="{Binding ElementName=RootPage, Path=ViewModel.GoToNextCommand}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Padding="32,8" Height="42">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Next" FontWeight="SemiBold" />
-                        <FontIcon Glyph="&#xE72A;" FontSize="12" />
+                <!-- Pedagogical Coaching suggestions card (Expander) -->
+                <Expander Header="AI Pedagogical Coaching &amp; Suggestions" IsExpanded="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,8,0,0">
+                    <StackPanel Spacing="12" Margin="0,8,0,0">
+                        <TextBox Header="Core Strengths" IsReadOnly="True" Text="{Binding CoreStrengths, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                        <TextBox Header="Primary Weakness to Fix" IsReadOnly="True" Text="{Binding PrimaryWeakness, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="60" />
+                        <TextBox Header="Actionable Practice Exercise" IsReadOnly="True" Text="{Binding ActionablePractice, Mode=OneWay}" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Height="80" />
                     </StackPanel>
-                </Button>
+                </Expander>
             </StackPanel>
         </DataTemplate>
     </Page.Resources>
@@ -273,22 +248,23 @@
         
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <TextBlock Text="Speaking Evaluation" Style="{StaticResource PageTitleStyle}" />
-            <ToggleSwitch Header="Focus Mode" IsOn="{x:Bind ViewModel.IsFocusMode, Mode=TwoWay}" HorizontalAlignment="Right" />
         </Grid>
         
-        <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=OneWay}" 
+        <InfoBar Grid.Row="1" IsOpen="{x:Bind ViewModel.IsErrorVisible, Mode=TwoWay}" 
                  Severity="{x:Bind ViewModel.InfoBarSeverity, Mode=OneWay}" 
                  Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" 
                  Margin="0,0,0,16"/>
         
-        <!-- Selection Grid: Student and Mode -->
+        <!-- Selection Grid: Student, Mode and Scope -->
         <Grid Grid.Row="2" ColumnSpacing="16" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <ComboBox Grid.Column="0" Header="Student" ItemsSource="{x:Bind ViewModel.Students, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind ViewModel.SelectedStudent, Mode=TwoWay}" PlaceholderText="Select student..." HorizontalAlignment="Stretch" />
             <ComboBox Grid.Column="1" Header="Evaluation Mode" ItemsSource="{x:Bind ViewModel.EvaluationModes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedEvaluationMode, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+            <ComboBox Grid.Column="2" Header="Evaluation Scope" ItemsSource="{x:Bind ViewModel.EvaluationScopes, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedEvaluationScope, Mode=TwoWay}" HorizontalAlignment="Stretch" />
         </Grid>
 
         <!-- Horizontal Session Summary -->
@@ -321,7 +297,8 @@
                             <TextBlock Text="Pronunc.:" Opacity="0.6" VerticalAlignment="Center"/>
                             <TextBlock Text="{x:Bind ViewModel.Evaluation.Pronunciation, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <Button Content="Save Session" Command="{x:Bind ViewModel.SaveSessionCommand}" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
+                        <Button Content="Auto-Grade with AI" Command="{x:Bind ViewModel.GradeWithAiCentralizedCommand}" Style="{StaticResource AccentButtonStyle}" Margin="16,0,0,0" />
+                        <Button Content="Save Session" Command="{x:Bind ViewModel.SaveSessionCommand}" Style="{StaticResource AccentButtonStyle}" Margin="8,0,0,0" />
                         <Button Content="Clear Session" Command="{x:Bind ViewModel.ClearSessionCommand}" Style="{StaticResource DefaultButtonStyle}" Margin="8,0,0,0" />
                     </StackPanel>
                 </Grid>
@@ -329,9 +306,8 @@
         </Border>
 
         <Grid Grid.Row="4">
-            <!-- SIMULTANEOUS MODE -->
-            <ScrollViewer Visibility="{x:Bind ViewModel.SimultaneousModeVisibility, Mode=OneWay}" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Evaluation.Parts}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.VisibleSpeakingParts, Mode=OneWay}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:SpeakingPart">
                             <Border Style="{StaticResource CardOuterShellStyle}" Margin="0,0,0,24">
@@ -346,26 +322,18 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
+        </Grid>
 
-            <!-- FOCUS MODE -->
-            <Pivot Visibility="{x:Bind ViewModel.FocusModeVisibility, Mode=OneWay}" SelectedIndex="{x:Bind ViewModel.ActivePivotIndex, Mode=TwoWay}" ItemsSource="{x:Bind ViewModel.Evaluation.Parts}">
-                <Pivot.HeaderTemplate>
-                    <DataTemplate x:DataType="models:SpeakingPart">
-                        <TextBlock Text="{x:Bind views:SpeakingEvaluationPage.FormatPartTitle(PartNumber)}" />
-                    </DataTemplate>
-                </Pivot.HeaderTemplate>
-                <Pivot.ItemTemplate>
-                    <DataTemplate x:DataType="models:SpeakingPart">
-                        <ScrollViewer Margin="0,16,0,0" VerticalScrollBarVisibility="Auto">
-                            <Border Style="{StaticResource CardOuterShellStyle}" Margin="0,0,0,24">
-                                <Border Style="{StaticResource PremiumCardStyle}">
-                                    <ContentPresenter Content="{x:Bind}" ContentTemplate="{StaticResource SpeakingPartTemplate}" />
-                                </Border>
-                            </Border>
-                        </ScrollViewer>
-                    </DataTemplate>
-                </Pivot.ItemTemplate>
-            </Pivot>
+        <!-- Busy/Loading Overlay (Global Loader) -->
+        <Grid Grid.Row="0" Grid.RowSpan="5"
+              Background="#66000000"
+              Visibility="{x:Bind views:SpeakingEvaluationPage.LoaderVisibility(ViewModel.IsLoading), Mode=OneWay}"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                <ProgressRing IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Width="50" Height="50" Foreground="White" />
+                <TextBlock Text="Evaluating with AI, please wait..." Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

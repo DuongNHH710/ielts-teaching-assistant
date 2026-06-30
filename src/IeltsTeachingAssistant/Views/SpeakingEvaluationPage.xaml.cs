@@ -8,14 +8,30 @@ namespace IeltsTeachingAssistant.Views;
 
 public sealed partial class SpeakingEvaluationPage : Page
 {
+    private readonly IServiceScope _scope;
     public SpeakingEvaluationViewModel ViewModel { get; }
 
     public SpeakingEvaluationPage()
     {
+        _scope = App.Services.CreateScope();
+        ViewModel = _scope.ServiceProvider.GetRequiredService<SpeakingEvaluationViewModel>();
         this.InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<SpeakingEvaluationViewModel>();
         DataContext = ViewModel;
+        this.Unloaded += async (s, e) =>
+        {
+            try
+            {
+                while (ViewModel.IsLoading)
+                {
+                    await Task.Delay(50);
+                }
+            }
+            catch { }
+            _scope.Dispose();
+        };
     }
+
+    public static Visibility LoaderVisibility(bool isLoading) => isLoading ? Visibility.Visible : Visibility.Collapsed;
 
     protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {

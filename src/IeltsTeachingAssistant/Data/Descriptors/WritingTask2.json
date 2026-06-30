@@ -1,0 +1,365 @@
+{
+  "Criteria": ["Task Response", "Coherence & Cohesion", "Lexical Resource", "Grammatical Range & Accuracy"],
+  "Bands": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+  "Cells": [
+    {
+      "Band": 9,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The prompt is <positive>appropriately addressed</positive> and explored in depth.",
+        "A clear and <positive>fully developed position</positive> is presented which directly answers the question/s.",
+        "Ideas are <positive>relevant, fully extended</positive> and well supported.",
+        "Any <limitation>lapses</limitation> in content or support are extremely rare."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "The message can be followed <positive>effortlessly</positive>.",
+        "<positive>Cohesion</positive> is used in such a way that it very rarely attracts attention.",
+        "Any <limitation>lapses</limitation> in coherence or cohesion are minimal.",
+        "<positive>Paragraphing</positive> is skilfully managed."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "<positive>Full flexibility</positive> and <positive>precise</positive> use are widely evident.",
+        "A <positive>wide range</positive> of vocabulary is used <positive>accurately</positive> and <positive>appropriately</positive> with very <positive>natural</positive> and sophisticated control of lexical features.",
+        "Minor <limitation>errors</limitation> in spelling and word formation are extremely rare and have <positive>minimal impact</positive> on communication."
+      ]
+    },
+    {
+      "Band": 9,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "A <positive>wide range</positive> of structures is used with <positive>full flexibility</positive> and control.",
+        "<positive>Punctuation</positive> and grammar are used <positive>appropriately</positive> throughout.",
+        "Minor <limitation>errors</limitation> are extremely rare and have <positive>minimal impact</positive> on communication."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The prompt is <positive>appropriately</positive> and sufficiently addressed.",
+        "A clear and <positive>well-developed position</positive> is presented in response to the question/s.",
+        "Ideas are <positive>relevant</positive>, well extended and supported.",
+        "There may be occasional omissions or <limitation>lapses</limitation> in content."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "The message can be followed <positive>with ease</positive>.",
+        "Information and ideas are logically <positive>sequenced</positive>, and cohesion is well managed.",
+        "Occasional <limitation>lapses</limitation> in coherence and cohesion may occur.",
+        "<positive>Paragraphing</positive> is used sufficiently and appropriately."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "A <positive>wide resource</positive> is fluently and <positive>flexibly</positive> used to convey precise meanings.",
+        "There is <positive>skilful</positive> use of uncommon and/or idiomatic items when appropriate, despite occasional <limitation>inaccuracies</limitation> in word choice and collocation.",
+        "Occasional <limitation>errors</limitation> in spelling and/or word formation may occur, but have <positive>minimal impact</positive> on communication."
+      ]
+    },
+    {
+      "Band": 8,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "A <positive>wide range</positive> of structures is flexibly and accurately used.",
+        "The majority of sentences are <positive>error-free</positive>, and punctuation is well managed.",
+        "Occasional, non-systematic <limitation>errors</limitation> and inappropriacies occur, but have <positive>minimal impact</positive> on communication."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The main parts of the prompt are <positive>appropriately addressed</positive>.",
+        "A <positive>clear and developed position</positive> is presented.",
+        "Main ideas are extended and supported but there may be a tendency to <limitation>over-generalise</limitation> or there may be a <limitation>lack of focus</limitation> and precision in supporting ideas/material."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "Information and ideas are <positive>logically organised</positive>, and there is a <positive>clear progression</positive> throughout the response. (A few <limitation>lapses</limitation> may occur, but these are minor.)",
+        "A range of cohesive devices including reference and substitution is used <positive>flexibly</positive> but with some <limitation>inaccuracies</limitation> or some <limitation>over/under use</limitation>.",
+        "<positive>Paragraphing</positive> is generally used effectively to support overall coherence, and the sequencing of ideas within a paragraph is <positive>generally logical</positive>."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <positive>sufficient</positive> to allow some flexibility and precision.",
+        "There is some ability to use <positive>less common</positive> and/or idiomatic items.",
+        "An <positive>awareness</positive> of style and collocation is evident, though <limitation>inappropriacies</limitation> occur.",
+        "There are only a few <limitation>errors</limitation> in spelling and/or word formation and they <positive>do not detract</positive> from overall clarity."
+      ]
+    },
+    {
+      "Band": 7,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "A <positive>variety</positive> of complex structures is used with some flexibility and accuracy.",
+        "Grammar and punctuation are <positive>generally well controlled</positive>, and <positive>error-free</positive> sentences are frequent.",
+        "A few <limitation>errors</limitation> in grammar may persist, but these <positive>do not impede</positive> communication."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The main parts of the prompt are <positive>addressed</positive> (though some may be more fully covered than others). An <positive>appropriate format</positive> is used.",
+        "A position is presented that is <positive>directly relevant</positive> to the prompt, although the conclusions drawn may be <limitation>unclear, unjustified or repetitive</limitation>.",
+        "Main ideas are <positive>relevant</positive>, but some may be <limitation>insufficiently developed</limitation> or may <limitation>lack clarity</limitation>, while some supporting arguments and evidence may be <limitation>less relevant</limitation> or inadequate."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "Information and ideas are <positive>generally arranged coherently</positive> and there is a <positive>clear overall progression</positive>.",
+        "Cohesive devices are used to <positive>some good effect</positive> but cohesion within and/or between sentences may be <limitation>faulty or mechanical</limitation> due to misuse, overuse or omission.",
+        "The use of reference and substitution may <limitation>lack flexibility</limitation> or clarity and result in some <limitation>repetition or error</limitation>.",
+        "<limitation>Paragraphing</limitation> may not always be logical and/or the central topic may not always be clear."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <positive>generally adequate</positive> and appropriate for the task.",
+        "The meaning is <positive>generally clear</positive> in spite of a rather <limitation>restricted range</limitation> or a lack of precision in word choice.",
+        "If the writer is a risk-taker, there will be a <positive>wider range</positive> of vocabulary used but higher degrees of <limitation>inaccuracy</limitation> or inappropriacy.",
+        "There are some <limitation>errors</limitation> in spelling and/or word formation, but these <positive>do not impede</positive> communication."
+      ]
+    },
+    {
+      "Band": 6,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "A <positive>mix</positive> of simple and complex sentence forms is used but flexibility is <limitation>limited</limitation>.",
+        "Examples of more complex structures are <limitation>not marked</limitation> by the same level of accuracy as in simple structures.",
+        "<limitation>Errors</limitation> in grammar and punctuation occur, but <positive>rarely impede</positive> communication."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The main parts of the prompt are <limitation>incompletely addressed</limitation>. The format may be <limitation>inappropriate</limitation> in places.",
+        "The writer expresses a position, but the development is <limitation>not always clear</limitation>.",
+        "Some main ideas are put forward, but they are <limitation>limited</limitation> and are <limitation>not sufficiently developed</limitation> and/or there may be <limitation>irrelevant detail</limitation>.",
+        "There may be some <limitation>repetition</limitation>."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "Organisation is evident but is <limitation>not wholly logical</limitation> and there may be a <limitation>lack of overall progression</limitation>. Nevertheless, there is a sense of underlying coherence to the response.",
+        "The relationship of ideas can be followed but the sentences are <limitation>not fluently linked</limitation> to each other.",
+        "There may be <limitation>limited/overuse</limitation> of cohesive devices with some inaccuracy.",
+        "The writing may be <limitation>repetitive</limitation> due to inadequate and/or inaccurate use of reference and substitution.",
+        "<limitation>Paragraphing may be inadequate or missing.</limitation>"
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <limitation>limited</limitation> but minimally adequate for the task.",
+        "Simple vocabulary may be used <positive>accurately</positive> but the range does <limitation>not permit</limitation> much variation in expression.",
+        "There may be <limitation>frequent lapses</limitation> in the appropriacy of word choice and a lack of flexibility is apparent in frequent <limitation>simplifications and/or repetitions</limitation>.",
+        "<limitation>Errors</limitation> in spelling and/or word formation may be noticeable and may <limitation>cause some difficulty</limitation> for the reader."
+      ]
+    },
+    {
+      "Band": 5,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "The range of structures is <limitation>limited</limitation> and rather <limitation>repetitive</limitation>.",
+        "Although complex sentences are attempted, they tend to be <limitation>faulty</limitation>, and the greatest accuracy is achieved on simple sentences.",
+        "Grammatical <limitation>errors</limitation> may be frequent and <limitation>cause some difficulty</limitation> for the reader.",
+        "<limitation>Punctuation</limitation> may be faulty."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The prompt is tackled in a <limitation>minimal way</limitation>, or the answer is <limitation>tangential</limitation>, possibly due to some misunderstanding of the prompt. <limitation>The format may be inappropriate.</limitation>",
+        "A position is discernible, but the reader has to <limitation>read carefully</limitation> to find it.",
+        "Main ideas are <limitation>difficult to identify</limitation> and such ideas that are identifiable may <limitation>lack relevance, clarity and/or support</limitation>.",
+        "Large parts of the response may be <limitation>repetitive</limitation>."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "Information and ideas are evident but <limitation>not arranged coherently</limitation> and there is <limitation>no clear progression</limitation> within the response.",
+        "Relationships between ideas can be <limitation>unclear</limitation> and/or inadequately marked. There is some use of basic cohesive devices, which may be <limitation>inaccurate or repetitive</limitation>.",
+        "There is <limitation>inaccurate use</limitation> or a lack of substitution or referencing.",
+        "There may be <limitation>no paragraphing</limitation> and/or no clear main topic within paragraphs."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <limitation>limited and inadequate</limitation> for or <limitation>unrelated to the task</limitation>. Vocabulary is basic and may be used <limitation>repetitively</limitation>.",
+        "There may be <limitation>inappropriate use</limitation> of lexical chunks (e.g. memorised phrases, formulaic language and/or language from the input material).",
+        "Inappropriate word choice and/or <limitation>errors</limitation> in word formation and/or in spelling <limitation>may impede meaning</limitation>."
+      ]
+    },
+    {
+      "Band": 4,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "A <limitation>very limited</limitation> range of structures is used.",
+        "<limitation>Subordinate clauses are rare and simple sentences predominate.</limitation>",
+        "Some structures are produced accurately but grammatical <limitation>errors</limitation> are frequent and <limitation>may impede meaning</limitation>.",
+        "<limitation>Punctuation</limitation> is often faulty or inadequate."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "<limitation>No part</limitation> of the prompt is adequately addressed, or the prompt has been <limitation>misunderstood</limitation>.",
+        "<limitation>No relevant position</limitation> can be identified, and/or there is <limitation>little direct response</limitation> to the question/s.",
+        "There are <limitation>few ideas</limitation>, and these may be <limitation>irrelevant or insufficiently developed</limitation>."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "There is <limitation>no apparent</limitation> logical organisation. Ideas are discernible but <limitation>difficult to relate</limitation> to each other.",
+        "There is <limitation>minimal</limitation> use of sequencers or cohesive devices. Those used <limitation>do not necessarily indicate</limitation> a logical relationship between ideas.",
+        "There is <limitation>difficulty</limitation> in identifying referencing.",
+        "Any attempts at paragraphing are <limitation>unhelpful</limitation>."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <limitation>inadequate</limitation> (which may be due to the response being significantly underlength). Possible <limitation>over-dependence</limitation> on input material or memorised language.",
+        "Control of word choice and/or spelling is <limitation>very limited</limitation>, and <limitation>errors predominate</limitation>. These errors may <limitation>severely impede meaning</limitation>."
+      ]
+    },
+    {
+      "Band": 3,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "Sentence forms are attempted, but <limitation>errors</limitation> in grammar and punctuation <limitation>predominate</limitation> (except in memorised phrases or those taken from the input material). This <limitation>prevents most meaning</limitation> from coming through.",
+        "<limitation>Length may be insufficient to provide evidence of control of sentence forms.</limitation>"
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "The content <limitation>barely relates</limitation> to the prompt.",
+        "<limitation>No position</limitation> can be identified.",
+        "There may be glimpses of one or two ideas <limitation>without development</limitation>."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "There is <limitation>little relevant message</limitation>, or the <limitation>entire response may be off-topic</limitation>.",
+        "There is <limitation>little evidence</limitation> of control of organisational features."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "The resource is <limitation>extremely limited</limitation> with few recognisable strings, apart from <limitation>memorised</limitation> phrases.",
+        "There is <limitation>no apparent</limitation> control of word formation and/or spelling."
+      ]
+    },
+    {
+      "Band": 2,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "There is <limitation>little or no</limitation> evidence of sentence forms (except in memorised phrases)."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "<limitation>Responses of 20 words or fewer are rated at Band 1.</limitation>",
+        "<limitation>The content is wholly unrelated to the prompt.</limitation>",
+        "Any <limitation>copied</limitation> rubric must be discounted."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "<limitation>Responses of 20 words or fewer are rated at Band 1.</limitation>",
+        "The writing <limitation>fails to communicate</limitation> any message and appears to be by a virtual non-writer."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "<limitation>Responses of 20 words or fewer are rated at Band 1.</limitation>",
+        "<limitation>No resource is apparent</limitation>, except for a few isolated words."
+      ]
+    },
+    {
+      "Band": 1,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "<limitation>Responses of 20 words or fewer are rated at Band 1.</limitation>",
+        "<limitation>No rateable language is evident.</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Task Response",
+      "Descriptors": [
+        "<limitation>Should only be used where a candidate did not attend or attempt the question in any way, used a language other than English throughout, or where there is proof that a candidate’s answer has been totally memorised.</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Coherence & Cohesion",
+      "Descriptors": [
+        "<limitation>Should only be used where a candidate did not attend or attempt the question in any way, used a language other than English throughout, or where there is proof that a candidate’s answer has been totally memorised.</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Lexical Resource",
+      "Descriptors": [
+        "<limitation>Should only be used where a candidate did not attend or attempt the question in any way, used a language other than English throughout, or where there is proof that a candidate’s answer has been totally memorised.</limitation>"
+      ]
+    },
+    {
+      "Band": 0,
+      "Criteria": "Grammatical Range & Accuracy",
+      "Descriptors": [
+        "<limitation>Should only be used where a candidate did not attend or attempt the question in any way, used a language other than English throughout, or where there is proof that a candidate’s answer has been totally memorised.</limitation>"
+      ]
+    }
+  ]
+}

@@ -14,6 +14,14 @@
     <WindowsSdkPackageVersion>10.0.22621.52</WindowsSdkPackageVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Production v1.1 metadata -->
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Company>IELTS Teaching Assistant</Company>
+    <Product>IELTS Teaching Assistant</Product>
+    <Description>AI-powered IELTS teaching and evaluation assistant</Description>
+    <Copyright>Copyright © 2026 IELTS Teaching Assistant</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,6 +71,13 @@
   <!-- Localization resources -->
   <ItemGroup>
     <PRIResource Include="Strings\**\*.resw" />
+  </ItemGroup>
+
+  <!-- Data files -->
+  <ItemGroup>
+    <Content Include="Data\Descriptors\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <!-- Copy Views and Controls subfolders containing .xbf files to the publish directory -->

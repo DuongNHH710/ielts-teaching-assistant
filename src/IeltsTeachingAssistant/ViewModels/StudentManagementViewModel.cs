@@ -1,8 +1,10 @@
+using System;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IeltsTeachingAssistant.Data;
 using IeltsTeachingAssistant.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace IeltsTeachingAssistant.ViewModels;
 
@@ -104,8 +106,33 @@ public partial class StudentManagementViewModel : ObservableObject
 
     public async System.Threading.Tasks.Task DeleteStudentAsync(Student student)
     {
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
+        try
+        {
+            // Reload fresh from DB with all child evaluations
+            var toDelete = await _context.Students
+                .Include(s => s.SpeakingEvaluations)
+                .Include(s => s.WritingEvaluations)
+                .Include(s => s.ReadingEvaluations)
+                .Include(s => s.ListeningEvaluations)
+                .FirstOrDefaultAsync(s => s.Id == student.Id);
+
+            if (toDelete == null) return;
+
+            // Remove child records first (SQLite has no cascade delete configured)
+            _context.RemoveRange(toDelete.SpeakingEvaluations);
+            _context.RemoveRange(toDelete.WritingEvaluations);
+            _context.RemoveRange(toDelete.ReadingEvaluations);
+            _context.RemoveRange(toDelete.ListeningEvaluations);
+
+            _context.Students.Remove(toDelete);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[DeleteStudentAsync] Error: {ex}");
+            throw;
+        }
+
         await LoadDataAsync();
     }
 }

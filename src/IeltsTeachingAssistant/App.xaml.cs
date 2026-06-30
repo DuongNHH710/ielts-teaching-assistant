@@ -77,6 +77,11 @@ public partial class App : Application
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite($"Data Source={dbPath}"));
 
+        // Factory allows ViewModels to create short-lived DbContext instances
+        // per async operation, preventing concurrent-access crashes
+        services.AddDbContextFactory<AppDbContext>(options =>
+            options.UseSqlite($"Data Source={dbPath}"), ServiceLifetime.Singleton);
+
         // ─── Services ───
         services.AddHttpClient();
         services.AddSingleton<IAuthenticationService, AuthenticationService>();
@@ -85,17 +90,19 @@ public partial class App : Application
         services.AddScoped<IEvaluationService, EvaluationService>();
         services.AddScoped<IExportService, ExportService>();
         services.AddSingleton<INotificationService, NotificationService>();
+        services.AddScoped<DataImportService>();
 
         // ─── ViewModels ───
         services.AddTransient<LoginViewModel>();
         services.AddTransient<DashboardViewModel>();
-        services.AddTransient<SpeakingEvaluationViewModel>();
-        services.AddTransient<WritingEvaluationViewModel>();
+        services.AddTransient<IeltsTeachingAssistant.ViewModels.Marking.MainMarkingViewModel>();
         services.AddTransient<ClassManagementViewModel>();
         services.AddTransient<StudentManagementViewModel>();
         services.AddTransient<StudentPerformanceViewModel>();
         services.AddTransient<ClassPerformanceViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<WritingEvaluationViewModel>();
+        services.AddTransient<SpeakingEvaluationViewModel>();
 
         // ─── Logging ───
         services.AddLogging(builder =>

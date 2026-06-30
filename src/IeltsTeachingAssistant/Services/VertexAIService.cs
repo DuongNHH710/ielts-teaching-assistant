@@ -36,17 +36,25 @@ public class VertexAIService : IVertexAIService
         return await context.Settings.FirstOrDefaultAsync();
     }
 
-    private async Task<string?> GetAccessTokenAsync(string credentialsPath)
+    private async Task<string?> GetAccessTokenAsync(string? credentialsPath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(credentialsPath) || !File.Exists(credentialsPath))
-                return null;
-
             if (_cachedCredential == null || _cachedCredentialsPath != credentialsPath)
             {
-                _cachedCredential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(credentialsPath)
-                    .CreateScoped("https://www.googleapis.com/auth/cloud-platform");
+                if (!string.IsNullOrWhiteSpace(credentialsPath) && File.Exists(credentialsPath))
+                {
+                    _cachedCredential = Google.Apis.Auth.OAuth2.GoogleCredential.FromFile(credentialsPath)
+                        .CreateScoped("https://www.googleapis.com/auth/cloud-platform");
+                }
+                else
+                {
+                    _cachedCredential = await Google.Apis.Auth.OAuth2.GoogleCredential.GetApplicationDefaultAsync();
+                    if (_cachedCredential.IsCreateScopedRequired)
+                    {
+                        _cachedCredential = _cachedCredential.CreateScoped("https://www.googleapis.com/auth/cloud-platform");
+                    }
+                }
                 _cachedCredentialsPath = credentialsPath;
             }
 
@@ -63,9 +71,9 @@ public class VertexAIService : IVertexAIService
     private async Task<string?> CallGeminiAsync(string systemPrompt, string userPrompt)
     {
         var settings = await GetSettingsAsync();
-        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId) || string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
+        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId))
         {
-            _logger.LogWarning("Vertex AI settings are not fully configured.");
+            _logger.LogWarning("Vertex AI settings are not fully configured. Project ID is missing.");
             return null;
         }
 
@@ -138,15 +146,15 @@ public class VertexAIService : IVertexAIService
         }
 
         var settings = await GetSettingsAsync();
-        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId) || string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
+        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId))
         {
-            throw new InvalidOperationException("Vertex AI settings are not fully configured. Please configure your GCP Project ID and Credentials Path in Settings.");
+            throw new InvalidOperationException("Vertex AI settings are not fully configured. Please configure your GCP Project ID in Settings.");
         }
 
         var token = await GetAccessTokenAsync(settings.GcpCredentialsPath);
         if (token == null)
         {
-            throw new InvalidOperationException("Failed to obtain GCP access token. Please check your credentials file path and validity in Settings.");
+            throw new InvalidOperationException("Failed to obtain GCP access token. Please check your credentials file path or ensure Application Default Credentials are set up.");
         }
 
         try
@@ -255,7 +263,8 @@ public class VertexAIService : IVertexAIService
             "1. \"band\": An individual score formatted as a float (e.g., 6.0, 7.0).\n" +
             "2. \"key_justification\": A concise textual explanation of the score.\n" +
             "3. \"supporting_evidence_quotes\": An array of exact, unedited strings from the student's transcript.\n" +
-            "4. \"limiting_factors\": An array of specific structural rules that capped or decided the score.\n\n" +
+            "4. \"limiting_factors\": An array of specific structural rules that capped or decided the score.\n" +
+            "5. \"matched_descriptor_ids\": An array of specific string IDs from the provided rubric JSON that the student achieved.\n\n" +
             "Speaking Module Telemetry:\n" +
             "Map the provided part-specific telemetry inputs (wpm_rate, long_pause_count) directly to their respective parts ('part_1', 'part_2', 'part_3') within the 'test_parts_breakdown' attribute of the output JSON.\n\n" +
             "Core Band Calculation Algorithmic Rules:\n" +
@@ -283,25 +292,29 @@ public class VertexAIService : IVertexAIService
             "      \"band\": 0.0,\n" +
             "      \"key_justification\": \"string\",\n" +
             "      \"supporting_evidence_quotes\": [\"string\"],\n" +
-            "      \"limiting_factors\": [\"string\"]\n" +
+            "      \"limiting_factors\": [\"string\"],\n" +
+            "      \"matched_descriptor_ids\": [\"string\"]\n" +
             "    },\n" +
             "    \"lexical_resource\": {\n" +
             "      \"band\": 0.0,\n" +
             "      \"key_justification\": \"string\",\n" +
             "      \"supporting_evidence_quotes\": [\"string\"],\n" +
-            "      \"limiting_factors\": [\"string\"]\n" +
+            "      \"limiting_factors\": [\"string\"],\n" +
+            "      \"matched_descriptor_ids\": [\"string\"]\n" +
             "    },\n" +
             "    \"grammatical_range_accuracy\": {\n" +
             "      \"band\": 0.0,\n" +
             "      \"key_justification\": \"string\",\n" +
             "      \"supporting_evidence_quotes\": [\"string\"],\n" +
-            "      \"limiting_factors\": [\"string\"]\n" +
+            "      \"limiting_factors\": [\"string\"],\n" +
+            "      \"matched_descriptor_ids\": [\"string\"]\n" +
             "    },\n" +
             "    \"pronunciation\": {\n" +
             "      \"band\": 0.0,\n" +
             "      \"key_justification\": \"string\",\n" +
             "      \"supporting_evidence_quotes\": [\"string\"],\n" +
-            "      \"limiting_factors\": [\"string\"]\n" +
+            "      \"limiting_factors\": [\"string\"],\n" +
+            "      \"matched_descriptor_ids\": [\"string\"]\n" +
             "    }\n" +
             "  },\n" +
             "  \"student_coaching\": {\n" +
@@ -309,7 +322,8 @@ public class VertexAIService : IVertexAIService
             "    \"primary_weakness_to_fix\": \"string\",\n" +
             "    \"actionable_practice_exercise\": \"string\"\n" +
             "  }\n" +
-            "}";
+            "}\n\n" +
+            $"Official Speaking Rubric:\n{JsonSerializer.Serialize(IeltsDescriptors.SpeakingDescriptors, new JsonSerializerOptions { WriteIndented = true })}";
 
         string userPromptText = $"Evaluate Part {partNumber} of IELTS Speaking.\n" +
             $"Telemetry for Part {partNumber}:\n" +
@@ -324,7 +338,7 @@ public class VertexAIService : IVertexAIService
         if (useAudio)
         {
             var settings = await GetSettingsAsync();
-            if (settings != null && !string.IsNullOrWhiteSpace(settings.GcpProjectId) && !string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
+            if (settings != null && !string.IsNullOrWhiteSpace(settings.GcpProjectId))
             {
                 var token = await GetAccessTokenAsync(settings.GcpCredentialsPath);
                 if (token != null)
@@ -473,6 +487,7 @@ public class VertexAIService : IVertexAIService
             "   - \"key_justification\": A concise textual explanation of the score.\n" +
             "   - \"supporting_evidence_quotes\": An array of exact, unedited strings from the student's submission.\n" +
             "   - \"limiting_factors\": An array of specific structural rules that capped or decided the score.\n" +
+            "   - \"matched_descriptor_ids\": An array of string IDs from the provided rubric JSON that the student achieved.\n" +
             "2. \"coherence_cohesion\": (same structure)\n" +
             "3. \"lexical_resource\": (same structure)\n" +
             "4. \"grammatical_range_accuracy\": (same structure)\n\n" +
@@ -530,7 +545,8 @@ public class VertexAIService : IVertexAIService
             "    \"primary_weakness_to_fix\": \"string\",\n" +
             "    \"actionable_practice_exercise\": \"string\"\n" +
             "  }\n" +
-            "}";
+            "}\n\n" +
+            $"Official Writing Rubric:\n{JsonSerializer.Serialize(IeltsDescriptors.WritingDescriptors, new JsonSerializerOptions { WriteIndented = true })}";
 
         string userPrompt = $"Evaluate Task {taskNumber} of IELTS Writing.\n" +
             $"Prompt:\n{promptText}\n\nStudent Writing:\n{text}";
@@ -575,15 +591,15 @@ public class VertexAIService : IVertexAIService
         }
 
         var settings = await GetSettingsAsync();
-        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId) || string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
+        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId))
         {
-            throw new InvalidOperationException("Vertex AI settings are not fully configured. Please configure your GCP Project ID and Credentials Path in Settings.");
+            throw new InvalidOperationException("Vertex AI settings are not fully configured. Please configure your GCP Project ID in Settings.");
         }
 
         var token = await GetAccessTokenAsync(settings.GcpCredentialsPath);
         if (token == null)
         {
-            throw new InvalidOperationException("Failed to obtain GCP access token. Please check your credentials file path and validity in Settings.");
+            throw new InvalidOperationException("Failed to obtain GCP access token. Please check your credentials file path or ensure Application Default Credentials are set up.");
         }
 
         try
@@ -665,9 +681,9 @@ public class VertexAIService : IVertexAIService
     private async Task<string?> CallGeminiTextAsync(string systemPrompt, string userPrompt)
     {
         var settings = await GetSettingsAsync();
-        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId) || string.IsNullOrWhiteSpace(settings.GcpCredentialsPath))
+        if (settings == null || string.IsNullOrWhiteSpace(settings.GcpProjectId))
         {
-            _logger.LogWarning("Vertex AI settings are not fully configured.");
+            _logger.LogWarning("Vertex AI settings are not fully configured. Project ID is missing.");
             return null;
         }
 

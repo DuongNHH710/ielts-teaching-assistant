@@ -77,7 +77,7 @@
                                 <!-- Target Score -->
                                 <StackPanel Grid.Column="4" Spacing="4" VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="Target" FontSize="10" Opacity="0.6" />
-                                    <TextBlock Text="{Binding TargetBandScore}" FontWeight="SemiBold" FontSize="16" Foreground="Orange" />
+                                    <TextBlock Text="{Binding TargetBandScore}" FontWeight="SemiBold" FontSize="16" Foreground="{StaticResource WarningBrush}" />
                                 </StackPanel>
                                 
                                 <!-- Overall Score -->
@@ -119,7 +119,7 @@
                                         <TextBlock Text="Overall Band" FontSize="14" Opacity="0.8" VerticalAlignment="Center"/>
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                             <TextBlock Text="{x:Bind ViewModel.SelectedStudent.OverallBand, Mode=OneWay}" FontWeight="Bold" FontSize="24" Foreground="{ThemeResource SystemAccentColor}" />
-                                            <TextBlock Text="{x:Bind ViewModel.SelectedStudent.Trend, Mode=OneWay}" FontSize="14" Foreground="MediumSeaGreen" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                                            <TextBlock Text="{x:Bind ViewModel.SelectedStudent.Trend, Mode=OneWay}" FontSize="14" Foreground="{StaticResource SuccessBrush}" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
                                         </StackPanel>
                                     </Grid>
 

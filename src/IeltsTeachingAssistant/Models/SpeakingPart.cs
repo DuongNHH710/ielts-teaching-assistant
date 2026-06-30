@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -30,18 +31,22 @@ public partial class SpeakingPart : ObservableObject
     private string? _transcript;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OverallBand))]
     private double _fluencyCoherence;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OverallBand))]
     private double _lexicalResource;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OverallBand))]
     private double _grammaticalRange;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OverallBand))]
     private double _pronunciation;
 
-    public double OverallBand => Math.Round((FluencyCoherence + LexicalResource + GrammaticalRange + Pronunciation) / 4.0 * 2) / 2.0;
+    public double OverallBand => Helpers.BandScoreCalculator.CalculateSpeakingOverall(FluencyCoherence, LexicalResource, GrammaticalRange, Pronunciation);
 
     [ObservableProperty]
     private string? _fluencyCoherenceAIComment;
@@ -132,5 +137,40 @@ public partial class SpeakingPart : ObservableObject
     {
         get => _isGrading;
         set => SetProperty(ref _isGrading, value);
+    }
+
+    // ── Rubric grid highlight data (not persisted) ────────────────────────────
+    // Populated by the ViewModel after AI grading to drive RubricGridPanel.
+
+    private IReadOnlyList<string>? _rubricHighlightIds0;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public IReadOnlyList<string>? RubricHighlightIds0
+    {
+        get => _rubricHighlightIds0;
+        set => SetProperty(ref _rubricHighlightIds0, value);
+    }
+
+    private IReadOnlyList<string>? _rubricHighlightIds1;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public IReadOnlyList<string>? RubricHighlightIds1
+    {
+        get => _rubricHighlightIds1;
+        set => SetProperty(ref _rubricHighlightIds1, value);
+    }
+
+    private IReadOnlyList<string>? _rubricHighlightIds2;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public IReadOnlyList<string>? RubricHighlightIds2
+    {
+        get => _rubricHighlightIds2;
+        set => SetProperty(ref _rubricHighlightIds2, value);
+    }
+
+    private IReadOnlyList<string>? _rubricHighlightIds3;
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public IReadOnlyList<string>? RubricHighlightIds3
+    {
+        get => _rubricHighlightIds3;
+        set => SetProperty(ref _rubricHighlightIds3, value);
     }
 }

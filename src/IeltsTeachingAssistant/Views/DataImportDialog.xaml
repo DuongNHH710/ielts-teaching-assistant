@@ -1,0 +1,25 @@
+<ContentDialog
+    x:Class="IeltsTeachingAssistant.Views.DataImportDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Import Data"
+    PrimaryButtonText="Import"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary">
+
+    <StackPanel Spacing="16" MinWidth="400">
+        <TextBlock Text="How should we handle potential duplicate Classes or Students?" TextWrapping="Wrap" />
+        
+        <RadioButton x:Name="RadioSkip" Content="Skip existing records (Default)" IsChecked="True" Tag="Skip" GroupName="DupGroup" />
+        <TextBlock Text="Records with the same name will be ignored. Only new records will be added." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" Margin="32,-12,0,0" TextWrapping="Wrap"/>
+
+        <RadioButton x:Name="RadioUpdate" Content="Update existing records" Tag="Update" GroupName="DupGroup" />
+        <TextBlock Text="Records with the same name will have their details updated. New records will be added." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" Margin="32,-12,0,0" TextWrapping="Wrap"/>
+
+        <RadioButton x:Name="RadioAllow" Content="Allow duplicates" Tag="AllowDuplicate" GroupName="DupGroup" />
+        <TextBlock Text="All records in the file will be added as new, regardless of whether they already exist." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" Margin="32,-12,0,0" TextWrapping="Wrap"/>
+    </StackPanel>
+</ContentDialog>

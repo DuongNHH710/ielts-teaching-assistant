@@ -24,10 +24,10 @@ public sealed partial class SetupWizardDialog : ContentDialog
 
     private void Field_Changed(object sender, RoutedEventArgs e)
     {
+        // GcpCredentialsPath is optional — ADC is used when empty
         IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(PasswordBox.Password) &&
                                  !string.IsNullOrWhiteSpace(GcpProjectIdBox.Text) &&
-                                 !string.IsNullOrWhiteSpace(GcpRegionBox.Text) &&
-                                 !string.IsNullOrWhiteSpace(GcpCredentialsPathBox.Text);
+                                 !string.IsNullOrWhiteSpace(GcpRegionBox.Text);
     }
 
     private async void BrowseCredentialsButton_Click(object sender, RoutedEventArgs e)

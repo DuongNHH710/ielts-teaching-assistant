@@ -1,0 +1,64 @@
+<Page
+    x:Class="IeltsTeachingAssistant.Views.MarkingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IeltsTeachingAssistant.Views"
+    xmlns:controls="using:IeltsTeachingAssistant.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:IeltsTeachingAssistant.ViewModels.Marking"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.DataContext>
+        <vm:MainMarkingViewModel/>
+    </Page.DataContext>
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Configuration Bar (Matches Mockup) -->
+        <Border Grid.Row="0" 
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                BorderThickness="1" 
+                CornerRadius="8" 
+                Padding="16" 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <TextBlock Text="EXAM" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <ComboBox ItemsSource="{Binding Exams}" SelectedItem="{Binding SelectedExam, Mode=TwoWay}" Width="200" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                    <TextBlock Text="SKILL / PART" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                    <ComboBox ItemsSource="{Binding Skills}" SelectedItem="{Binding SelectedSkill, Mode=TwoWay}" Width="200" />
+                </StackPanel>
+
+                <!-- Mockup info text -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Text="Academic or General Training - 0-9 band scale" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                    <TextBlock Text="Standard IELTS evaluation criteria" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Dynamic Content Area -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentMarkingContent}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <ContentControl.ContentTemplateSelector>
+                <local:MarkingContentTemplateSelector />
+            </ContentControl.ContentTemplateSelector>
+        </ContentControl>
+
+    </Grid>
+</Page>

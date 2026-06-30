@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:IeltsTeachingAssistant.Models"
     mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Disabled">
 
     <Grid Padding="{StaticResource PagePadding}">
         <Grid.RowDefinitions>
@@ -25,38 +25,40 @@
         <InfoBar Grid.Row="1" x:Name="StatusInfo" IsOpen="False" Margin="0,0,0,16" />
 
         <!-- Student & Score Selection -->
-        <Grid Grid.Row="2" ColumnSpacing="16" Margin="0,0,0,24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <Expander Grid.Row="2" Header="Session Configuration" IsExpanded="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,0,0,24">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Student Select -->
-            <ComboBox Grid.Column="0" Header="Student" 
-                      x:Name="StudentCombo"
-                      PlaceholderText="Select student..." 
-                      HorizontalAlignment="Stretch" />
+                <!-- Student Select -->
+                <ComboBox Grid.Column="0" Header="Student" 
+                          x:Name="StudentCombo"
+                          PlaceholderText="Select student..." 
+                          HorizontalAlignment="Stretch" />
 
-            <!-- Band Score Slider -->
-            <StackPanel Grid.Column="1" Spacing="4">
-                <TextBlock Text="Reading Band Score" FontSize="12" FontWeight="SemiBold" Opacity="0.8" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Slider x:Name="ScoreSlider" Minimum="0" Maximum="9" StepFrequency="0.5" Value="6.0" TickFrequency="0.5" TickPlacement="Outside" />
-                    <TextBlock Grid.Column="1" x:Name="ScoreText" Text="{Binding Value, ElementName=ScoreSlider, Mode=OneWay}" VerticalAlignment="Center" Margin="16,0,0,0" FontWeight="Bold" FontSize="16" Width="30" />
-                </Grid>
-            </StackPanel>
+                <!-- Band Score Slider -->
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <TextBlock Text="Reading Band Score" FontSize="12" FontWeight="SemiBold" Opacity="0.8" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Slider x:Name="ScoreSlider" Minimum="0" Maximum="9" StepFrequency="0.5" Value="6.0" TickFrequency="0.5" TickPlacement="Outside" />
+                        <TextBlock Grid.Column="1" x:Name="ScoreText" Text="{Binding Value, ElementName=ScoreSlider, Mode=OneWay}" VerticalAlignment="Center" Margin="16,0,0,0" FontWeight="Bold" FontSize="16" Width="30" />
+                    </Grid>
+                </StackPanel>
 
-            <!-- Save Action Button -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
-                <Button x:Name="SaveButton" Content="Save Evaluation" Click="SaveButton_Click" Style="{StaticResource AccentButtonStyle}" Height="40" Padding="20,0" />
-                <Button x:Name="ClearButton" Content="Clear Workspace" Click="ClearButton_Click" Style="{StaticResource DefaultButtonStyle}" Height="40" />
-            </StackPanel>
-        </Grid>
+                <!-- Save Action Button -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
+                    <Button x:Name="SaveButton" Content="Save Evaluation" Click="SaveButton_Click" Style="{StaticResource AccentButtonStyle}" Height="40" Padding="20,0" />
+                    <Button x:Name="ClearButton" Content="Clear Workspace" Click="ClearButton_Click" Style="{StaticResource DefaultButtonStyle}" Height="40" />
+                </StackPanel>
+            </Grid>
+        </Expander>
 
         <!-- Main 2-Column Workspace -->
         <Grid Grid.Row="3" ColumnSpacing="24">
@@ -75,19 +77,19 @@
 
                 <!-- Reading Passage Input -->
                 <TextBox Grid.Row="0" x:Name="PassageInput"
-                         Header="Reading Task / Passage" 
-                         PlaceholderText="Paste the reading section or passage text here..." 
-                         AcceptsReturn="True" 
-                         TextWrapping="Wrap" 
-                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                          Header="Reading Task / Passage" 
+                          PlaceholderText="Paste the reading section or passage text here..." 
+                          AcceptsReturn="True" 
+                          TextWrapping="Wrap" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- Student Answers Input -->
                 <TextBox Grid.Row="1" x:Name="AnswersInput"
-                         Header="Student's Answers &amp; Work" 
-                         PlaceholderText="Enter the student's responses (e.g. Q1: True, Q2: False, Q3: Not Given or raw answers)..." 
-                         AcceptsReturn="True" 
-                         TextWrapping="Wrap" 
-                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                          Header="Student's Answers" 
+                          PlaceholderText="Enter the student's answers (e.g. Q1: True, Q2: False, Q3: Not Given)..." 
+                          AcceptsReturn="True" 
+                          TextWrapping="Wrap" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto" />
 
                 <!-- Action Button -->
                 <Button Grid.Row="2" x:Name="AnalyzeButton" 
@@ -97,7 +99,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ProgressRing x:Name="GradingProgress" IsActive="False" Width="16" Height="16" Margin="0,0,8,0" Foreground="White" />
                         <FontIcon Glyph="&#xE945;" FontSize="14" />
-                        <TextBlock Text="Analyze Misunderstanding with AI" FontWeight="SemiBold" />
+                        <TextBlock Text="Analyze Context &amp; Accuracy with AI" FontWeight="SemiBold" />
                     </StackPanel>
                 </Button>
             </Grid>
@@ -112,7 +114,7 @@
                         </Grid.RowDefinitions>
 
                         <!-- Header -->
-                        <TextBlock Grid.Row="0" Text="Diagnostic Misunderstanding Analysis" Style="{StaticResource SectionHeaderStyle}" />
+                        <TextBlock Grid.Row="0" Text="Context &amp; Accuracy Analysis" Style="{StaticResource SectionHeaderStyle}" />
 
                         <!-- Markdown Content Scroll -->
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

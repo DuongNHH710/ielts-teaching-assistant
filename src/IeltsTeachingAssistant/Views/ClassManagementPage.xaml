@@ -78,8 +78,8 @@
                                     <!-- Online Join Button -->
                                     <HyperlinkButton NavigateUri="{x:Bind views:ClassManagementPage.ConvertToUri(OnlineLink), Mode=OneWay}" ToolTipService.ToolTip="Join Online Session" Visibility="{x:Bind views:ClassManagementPage.GetLinkVisibility(OnlineLink), Mode=OneWay}" Padding="0" Margin="0,2,0,0" HorizontalAlignment="Left">
                                         <StackPanel Orientation="Horizontal" Spacing="4">
-                                            <FontIcon Glyph="&#xE714;" FontSize="12" Foreground="#3B82F6"/>
-                                            <TextBlock Text="Join Class" FontSize="11" Foreground="#3B82F6"/>
+                                            <FontIcon Glyph="&#xE714;" FontSize="12" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Join Class" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                                         </StackPanel>
                                     </HyperlinkButton>
                                 </StackPanel>
@@ -100,13 +100,11 @@
                                 <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Left">
                                     <Border Background="{ThemeResource LayerFillColorDefaultBrush}" Padding="8,3,8,3" CornerRadius="4" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
                                         <StackPanel Orientation="Horizontal" Spacing="4">
-                                            <FontIcon Glyph="{x:Bind views:ClassManagementPage.GetModeIcon(Mode), Mode=OneWay}" FontSize="10" Foreground="{ThemeResource SystemAccentColor}"/>
-                                            <TextBlock Text="{x:Bind Mode}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource SystemAccentColor}"/>
+                                            <FontIcon Glyph="{x:Bind views:ClassManagementPage.GetModeIcon(Mode), Mode=OneWay}" FontSize="10" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="{x:Bind Mode}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                                         </StackPanel>
                                     </Border>
-                                    <Border Background="{ThemeResource LayerFillColorDefaultBrush}" Padding="8,3,8,3" CornerRadius="4" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
-                                        <TextBlock Text="{x:Bind Status}" FontSize="10" FontWeight="SemiBold" Foreground="{x:Bind views:ClassManagementPage.GetStatusBrush(Status), Mode=OneWay}"/>
-                                    </Border>
+                                    <ToggleButton Content="{x:Bind Status}" Style="{StaticResource OutlineTagButtonStyle}" IsChecked="True" FontSize="10" Padding="8,2" IsHitTestVisible="False" Foreground="{x:Bind views:ClassManagementPage.GetStatusBrush(Status), Mode=OneWay}" BorderBrush="{x:Bind views:ClassManagementPage.GetStatusBrush(Status), Mode=OneWay}" />
                                 </StackPanel>
 
                                 <!-- Progress Bar -->
@@ -122,12 +120,12 @@
                                 <StackPanel Grid.Column="4" Spacing="4" VerticalAlignment="Center" HorizontalAlignment="Right" Width="120">
                                     <Grid>
                                         <TextBlock Text="Avg Band" FontSize="10" Opacity="0.6" />
-                                        <TextBlock Text="{x:Bind OverallBand, Mode=OneWay}" FontSize="11" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#3B82F6" />
+                                        <TextBlock Text="{x:Bind OverallBand, Mode=OneWay}" FontSize="11" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
                                     </Grid>
-                                    <ProgressBar Value="{x:Bind OverallBand, Mode=OneWay}" Minimum="0" Maximum="9" Height="4" CornerRadius="2" Foreground="#3B82F6" Background="#E2E8F0" />
+                                    <ProgressBar Value="{x:Bind OverallBand, Mode=OneWay}" Minimum="0" Maximum="9" Height="4" CornerRadius="2" Foreground="{ThemeResource AccentFillColorDefaultBrush}" Background="{ThemeResource ControlFillColorTransparentBrush}" />
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Text="Target: " FontSize="8" Opacity="0.5" Foreground="#10B981" />
-                                        <TextBlock Text="{x:Bind TargetBandScore, Mode=OneWay}" FontSize="8" Opacity="0.5" Foreground="#10B981" />
+                                        <TextBlock Text="Target: " FontSize="8" Opacity="0.5" Foreground="{StaticResource SuccessBrush}" />
+                                        <TextBlock Text="{x:Bind TargetBandScore, Mode=OneWay}" FontSize="8" Opacity="0.5" Foreground="{StaticResource SuccessBrush}" />
                                     </StackPanel>
                                 </StackPanel>
                             </Grid>
